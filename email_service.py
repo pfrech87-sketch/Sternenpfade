@@ -4,7 +4,8 @@ from email.message import EmailMessage
 from email.utils import formatdate
 
 SMTP_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')
-SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
+SMTP_PORT_STR = os.environ.get('SMTP_PORT', '587')
+SMTP_PORT = int(SMTP_PORT_STR) if SMTP_PORT_STR and SMTP_PORT_STR.strip() else 587
 SMTP_USERNAME = os.environ.get('SMTP_USERNAME', '')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'info@sternenpfade.at')
