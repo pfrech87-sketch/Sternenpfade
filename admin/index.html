@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestellungen - Sternenpfade Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Bestellungen</h1>
+        </header>
+
+        <div class="admin-toolbar">
+            <div class="search-filters">
+                <input type="text" id="searchInput" placeholder="Bestellungen suchen...">
+                <select id="statusFilter">
+                    <option value="">Status</option>
+                    <option value="Ausstehend">Ausstehend</option>
+                    <option value="Bezahlt">Bezahlt</option>
+                    <option value="Versandt">Versandt</option>
+                    <option value="Storniert">Storniert</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Kunde</th>
+                        <th>Datum</th>
+                        <th>Zahlungsmethode</th>
+                        <th>Gesamtsumme</th>
+                        <th>Nr.</th>
+                        <th>Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody">
+                    <!-- Orders will be loaded here via JS -->
+                    <tr>
+                        <td colspan="7" style="text-align: center;">Lade Bestellungen...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

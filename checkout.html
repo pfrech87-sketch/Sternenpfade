@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasse - Sternenpfade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .checkout-section {
+            padding: 8rem 2rem 4rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .checkout-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .form-group label {
+            font-weight: 500;
+            color: var(--c-white);
+            font-size: 0.9rem;
+        }
+        .checkout-form input, .checkout-form textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            color: var(--c-white);
+            font-family: inherit;
+        }
+        .checkout-form input:focus, .checkout-form textarea:focus {
+            outline: none;
+            border-color: var(--c-gold);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .order-summary {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--c-gold);
+        }
+        .payment-info {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+        }
+    </style>
+
+    <!-- Open Graph Tags für Social Media & KI Previews -->
+    <meta property="og:title" content="Sternenpfade | Schamanische Begleitung">
+    <meta property="og:description" content="Entdecke den Pfad der Tiere, der Menschen und des Jenseits mit Patrick Frech.">
+    <meta property="og:image" content="https://www.sternenpfade.at/assets/kategorie_mensch-belgeitung2.jpeg">
+    <meta property="og:url" content="https://www.sternenpfade.at">
+    <meta property="og:type" content="website">
+
+    <!-- Schema.org / JSON-LD für KI-Suchmaschinen -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Sternenpfade - Patrick Frech",
+      "image": "https://www.sternenpfade.at/assets/patrick-trust.JPG",
+      "description": "Schamanische & mediale Begleitung für Tiere und Menschen. Tierkommunikation, Jenseitskontakte, SoulLink und schamanisches Coaching.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "AT"
+      },
+      "telephone": "+4369010571792",
+      "email": "info@sternenpfade.at",
+      "url": "https://www.sternenpfade.at",
+      "founder": {
+        "@type": "Person",
+        "name": "Patrick Frech, MA",
+        "jobTitle": "Schamane & Gründer"
+      },
+      "sameAs": [
+        "https://www.instagram.com/deinesternenpfade/",
+        "https://www.tiktok.com/@sternenpfade"
+      ]
+    }
+    </script>
+    </head>
+<body class="theme-dark">
+    <!-- Header/Nav -->
+    <header class="main-header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo"><img src="assets/logo-wei.png" alt="Sternenpfade Logo" style="height: 40px;"></a>
+            <a href="booking.html" style="color: var(--c-white); text-decoration: none;">&larr; Zurück</a>
+        </nav>
+    </header>
+
+    <!-- Main Content for KI & Accessibility -->
+    <main id="main-content">
+
+    <main>
+        <section class="checkout-section">
+            <h1 style="margin-bottom: 2rem; text-align: center;">Kasse</h1>
+            
+            <div id="successMessage" style="display: none; text-align: center; background: rgba(124, 179, 66, 0.2); padding: 2rem; border-radius: 8px; border: 1px solid #7cb342;">
+                <h2 style="color: #aed581;">Buchung erfolgreich!</h2>
+                <p>Vielen Dank für deine Buchung. Deine Rechnungsnummer ist <strong id="successOrderNumber"></strong>.</p>
+                <p>Du erhältst in Kürze eine Bestätigung. Bitte überweise den Betrag auf das angegebene Konto.</p>
+                <a href="booking.html" class="btn btn-primary" style="margin-top: 1rem;">Zurück zur Übersicht</a>
+            </div>
+
+            <div class="checkout-grid" id="checkoutFormContainer">
+                <div class="order-summary">
+                    <h3>Deine Auswahl</h3>
+                    <div class="summary-item">
+                        <span id="itemNameDisplay">Lade...</span>
+                        <span id="itemPriceDisplay">€ 0,00</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Gesamt</span>
+                        <span id="totalPriceDisplay">€ 0,00</span>
+                    </div>
+                    <div class="payment-info">
+                        <strong>Zahlungsmethode:</strong> Überweisung, Vorkasse
+                    </div>
+                </div>
+
+                <form class="checkout-form" id="checkoutForm">
+                    <div class="form-group">
+                        <label for="name">Vor- und Nachname *</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-Mail Adresse *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Telefonnummer</label>
+                        <input type="tel" id="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Rechnungsadresse *</label>
+                        <textarea id="address" rows="3" placeholder="Straße, Hausnummer&#10;PLZ, Ort&#10;Land" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Anmerkungen (Optional)</label>
+                        <textarea id="notes" rows="2" placeholder="Hast du noch Fragen oder Wünsche?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;" id="submitBtn">Kostenpflichtig buchen</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const itemName = urlParams.get('item') || 'Unbekannter Artikel';
+            const itemPrice = parseFloat(urlParams.get('price')) || 0;
+
+            document.getElementById('itemNameDisplay').textContent = itemName;
+            document.getElementById('itemPriceDisplay').textContent = itemPrice === 0 ? 'Gratis' : `€ ${itemPrice.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalPriceDisplay').textContent = itemPrice === 0 ? 'Gratis' : `€ ${itemPrice.toFixed(2).replace('.', ',')}`;
+
+            if (itemPrice === 0) {
+                document.getElementById('submitBtn').textContent = 'Jetzt gratis sichern';
+                document.querySelector('.payment-info').style.display = 'none';
+            }
+
+            document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const btn = document.getElementById('submitBtn');
+                btn.textContent = 'Wird bearbeitet...';
+                btn.disabled = true;
+
+                const data = {
+                    customer_name: document.getElementById('name').value,
+                    customer_email: document.getElementById('email').value,
+                    customer_phone: document.getElementById('phone').value,
+                    billing_address: document.getElementById('address').value,
+                    notes: document.getElementById('notes').value,
+                    items: [
+                        { name: itemName, quantity: 1, price: itemPrice }
+                    ]
+                };
+
+                try {
+                    const response = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        document.getElementById('checkoutFormContainer').style.display = 'none';
+                        document.getElementById('successMessage').style.display = 'block';
+                        document.getElementById('successOrderNumber').textContent = result.order_number;
+                        
+                        if (itemPrice === 0) {
+                            document.getElementById('successMessage').querySelector('p:nth-of-type(2)').innerHTML = 
+                                'Du erhältst in Kürze eine E-Mail mit deinem Download-Link. Viel Freude damit!';
+                        }
+                        
+                        // Scroll to top
+                        window.scrollTo(0, 0);
+                    } else {
+                        throw new Error(result.error || 'Fehler bei der Buchung');
+                    }
+                } catch (error) {
+                    alert('Es ist ein Fehler aufgetreten: ' + error.message);
+                    btn.textContent = itemPrice === 0 ? 'Jetzt gratis sichern' : 'Kostenpflichtig buchen';
+                    btn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

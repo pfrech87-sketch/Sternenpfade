@@ -1,0 +1,10 @@
+backend/.env
+backend/venv/
+__pycache__/
+*.pyc
+.DS_Store
+sternenpfade.db
+invoices/
+admin/invoices/
+node_modules/
+.vscode/

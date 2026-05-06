@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestellung Details - Sternenpfade Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Bestellung #<span id="orderNumberDisplay">...</span></h1>
+            <a href="index.html" class="back-link">&larr; Zurück zu Bestellungen</a>
+        </header>
+
+        <div class="order-details-grid">
+            <div class="card">
+                <div class="form-group row">
+                    <label>Kunde</label>
+                    <div id="customerEmail" class="value text-blue">...</div>
+                </div>
+                
+                <div class="form-group row">
+                    <label>Rechnungsadresse</label>
+                    <div id="billingAddress" class="value">
+                        ...
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label>Lieferadresse</label>
+                    <div id="shippingAddress" class="value text-italic">
+                        Entspricht der Rechnungsadresse
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label>Bestellstatus</label>
+                    <div class="value">
+                        <select id="orderStatusSelect">
+                            <option value="Ausstehend">Ausstehend</option>
+                            <option value="Bezahlt">Bezahlt</option>
+                            <option value="Versandt">Versandt</option>
+                            <option value="Storniert">Storniert</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label>Anmerkungen</label>
+                    <div class="value">
+                        <textarea id="orderNotes" readonly rows="4" style="width:100%; border:1px solid #ccc; border-radius:4px; padding:8px;"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-actions" style="margin-left: 150px; margin-top: 15px;">
+                    <button id="saveStatusBtn" class="btn btn-green">Speichern</button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <div id="orderItemsList">
+                        <!-- Items -->
+                    </div>
+                    <hr>
+                    <div class="flex-between bold" style="padding-top:10px; font-size:16px;">
+                        <span>Gesamtbetrag</span>
+                        <span id="totalAmount">€ ...</span>
+                    </div>
+                </div>
+
+                <div class="card action-card">
+                    <button class="btn btn-block btn-green-dark" style="margin-bottom: 15px;">Als versandt markieren &darr;</button>
+                    
+                    <div class="history-item">
+                        <div class="icon bg-blue">💳</div>
+                        <div>
+                            <b>Bestellung <span id="historyStatus">...</span></b> (manuell)<br>
+                            <span class="text-sm text-gray">Zahlungsmethode: <span id="paymentMethod">...</span></span><br>
+                            <span class="text-sm text-gray" id="historyDate">...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card action-card flex-between">
+                    <button class="btn btn-red">Löschen</button>
+                    <button id="printInvoiceBtn" class="btn btn-default">📄 Drucken &darr;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/order.js"></script>
+</body>
+</html>
