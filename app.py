@@ -17,7 +17,7 @@ from email_service import send_order_confirmation, send_digital_delivery
 init_db()
 
 app = Flask(__name__, 
-            static_folder=os.path.abspath(os.path.join(os.path.dirname(__file__), '..')), 
+            static_folder=os.path.dirname(os.path.abspath(__file__)), 
             static_url_path='/')
 CORS(app)  # Enable CORS for all routes (since frontend is on same origin or different port in dev)
 
@@ -47,7 +47,7 @@ def serve_pages(filename):
 def download_file(filename):
     # In a real app, you might want to check if the user has a valid order
     # For now, we serve from the downloads folder
-    downloads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'downloads')
+    downloads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
     return send_from_directory(downloads_dir, filename)
 
 @app.route('/api/checkout', methods=['POST'])
@@ -231,7 +231,7 @@ def get_order_invoice(order_id):
             return jsonify({'error': 'Order not found'}), 404
             
         filename = f"Rechnung_{order['order_number']}.pdf"
-        data_dir = os.environ.get('DATA_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+        data_dir = os.environ.get('DATA_DIR', os.path.dirname(os.path.abspath(__file__)))
         filepath = os.path.join(data_dir, 'invoices', filename)
         
         if not os.path.exists(filepath):

@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DATA_DIR = os.environ.get('DATA_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+DATA_DIR = os.environ.get('DATA_DIR', os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(DATA_DIR, 'sternenpfade.db')
 
 def get_db_connection():

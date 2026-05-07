@@ -5,7 +5,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.units import cm
 
-DATA_DIR = os.environ.get('DATA_DIR', os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+DATA_DIR = os.environ.get('DATA_DIR', os.path.dirname(os.path.abspath(__file__)))
 INVOICE_DIR = os.path.join(DATA_DIR, 'invoices')
 if not os.path.exists(INVOICE_DIR):
     os.makedirs(INVOICE_DIR)
