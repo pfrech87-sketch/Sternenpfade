@@ -25,6 +25,24 @@ CORS(app)  # Enable CORS for all routes (since frontend is on same origin or dif
 def index():
     return app.send_static_file('index.html')
 
+@app.route('/assets/<path:filename>')
+def serve_assets(filename):
+    return send_from_directory(os.path.join(app.static_folder, 'assets'), filename)
+
+@app.route('/css/<path:filename>')
+def serve_css(filename):
+    return send_from_directory(os.path.join(app.static_folder, 'css'), filename)
+
+@app.route('/js/<path:filename>')
+def serve_js(filename):
+    return send_from_directory(os.path.join(app.static_folder, 'js'), filename)
+
+@app.route('/<path:filename>')
+def serve_pages(filename):
+    if filename.endswith('.html'):
+        return app.send_static_file(filename)
+    return send_from_directory(app.static_folder, filename)
+
 @app.route('/downloads/<path:filename>')
 def download_file(filename):
     # In a real app, you might want to check if the user has a valid order
