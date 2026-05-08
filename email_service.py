@@ -91,13 +91,16 @@ def send_order_confirmation(order_dict, pdf_path):
         msg.add_attachment(pdf_data, maintype='application', subtype='pdf', filename=pdf_name)
 
     try:
+        print(f"Connecting to SMTP server {SMTP_SERVER}:{SMTP_PORT}...")
         if SMTP_PORT == 465:
-            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
+            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=10)
         else:
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
             server.starttls()
             
+        print("Logging in...")
         server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        print("Sending message...")
         server.send_message(msg)
         server.quit()
         print(f"Successfully sent confirmation email to {customer_email}")
@@ -156,15 +159,19 @@ def send_digital_delivery(order_dict):
     msg.set_content("\n".join(body_parts))
 
     try:
+        print(f"Connecting to SMTP server {SMTP_SERVER}:{SMTP_PORT}...")
         if SMTP_PORT == 465:
-            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
+            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=10)
         else:
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
             server.starttls()
             
+        print("Logging in...")
         server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        print("Sending message...")
         server.send_message(msg)
         server.quit()
+        print(f"Successfully sent delivery email to {customer_email}")
         return True
     except Exception as e:
         print(f"Failed to send delivery email: {e}")
