@@ -50,6 +50,26 @@ def download_file(filename):
     downloads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
     return send_from_directory(downloads_dir, filename)
 
+@app.route('/api/test-email')
+def test_email():
+    test_order = {
+        'order_number': 'TEST-123',
+        'customer_name': 'Test User',
+        'customer_email': 'info@sternenpfade.at',
+        'total_amount': 10.0,
+        'items': [{'name': 'Test Artikel', 'price': 10.0, 'quantity': 1}]
+    }
+    from invoice_service import generate_invoice
+    try:
+        pdf_path = generate_invoice(test_order)
+        success = send_order_confirmation(test_order, pdf_path)
+        if success:
+            return jsonify({'success': True, 'message': 'Test email sent successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to send email. Check logs.'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/checkout', methods=['POST'])
 def checkout():
     data = request.json
