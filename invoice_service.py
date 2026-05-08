@@ -45,7 +45,7 @@ def generate_invoice(order):
     
     # Header Table (Rechnung Title & Logo)
     # Using a placeholder for logo, you can change the path to your actual logo
-    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'pfad_jenseits_img_1776710470972.png')
+    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'pfad_jenseits_img_1776710470972.png')
     
     header_data = []
     if os.path.exists(logo_path):

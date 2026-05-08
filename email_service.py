@@ -35,11 +35,7 @@ def send_order_confirmation(order_dict, pdf_path):
             download_links.append((name, DIGITAL_PRODUCTS[name]))
 
     if not SMTP_USERNAME or not SMTP_PASSWORD:
-        print("SMTP credentials not configured in environment variables. Skipping real email sending.")
-        print(f"Simulated sending email to {customer_email}")
-        print(f"Subject: Bestellbestätigung - Sternenpfade (Bestellnummer: {order_dict.get('order_number')})")
-        if download_links:
-            print(f"Contains downloads: {download_links}")
+        print("SMTP credentials not configured. Skipping real email sending.")
         return False
 
     msg = EmailMessage()
@@ -87,6 +83,29 @@ def send_order_confirmation(order_dict, pdf_path):
     body = "\n".join(body_parts)
     msg.set_content(body)
 
+    # Attach PDF
+    if pdf_path and os.path.exists(pdf_path):
+        with open(pdf_path, 'rb') as f:
+            pdf_data = f.read()
+            pdf_name = os.path.basename(pdf_path)
+        msg.add_attachment(pdf_data, maintype='application', subtype='pdf', filename=pdf_name)
+
+    try:
+        if SMTP_PORT == 465:
+            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
+        else:
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+            server.starttls()
+            
+        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        print(f"Successfully sent confirmation email to {customer_email}")
+        return True
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        return False
+
 def send_digital_delivery(order_dict):
     customer_email = order_dict.get('customer_email')
     if not customer_email:
@@ -101,11 +120,9 @@ def send_digital_delivery(order_dict):
             download_links.append((name, DIGITAL_PRODUCTS[name]))
 
     if not download_links:
-        return False # Nothing to deliver
+        return False 
 
     if not SMTP_USERNAME or not SMTP_PASSWORD:
-        print(f"Simulated digital delivery email to {customer_email}")
-        print(f"Downloads: {download_links}")
         return False
 
     msg = EmailMessage()
@@ -116,8 +133,7 @@ def send_digital_delivery(order_dict):
 
     greeting = f"Hallo {order_dict.get('customer_name', '')},"
     body_parts = [
-        greeting,
-        "",
+        greeting, "",
         "vielen Dank für deine Zahlung! Dein Download ist nun für dich bereit.",
         "",
         "✨ DEINE DOWNLOADS:",
@@ -152,28 +168,4 @@ def send_digital_delivery(order_dict):
         return True
     except Exception as e:
         print(f"Failed to send delivery email: {e}")
-        return False
-
-    # Attach PDF
-    if pdf_path and os.path.exists(pdf_path):
-        with open(pdf_path, 'rb') as f:
-            pdf_data = f.read()
-            pdf_name = os.path.basename(pdf_path)
-        
-        msg.add_attachment(pdf_data, maintype='application', subtype='pdf', filename=pdf_name)
-
-    try:
-        if SMTP_PORT == 465:
-            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
-        else:
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-            server.starttls()
-            
-        server.login(SMTP_USERNAME, SMTP_PASSWORD)
-        server.send_message(msg)
-        server.quit()
-        print(f"Successfully sent confirmation email to {customer_email}")
-        return True
-    except Exception as e:
-        print(f"Failed to send email: {e}")
         return False
