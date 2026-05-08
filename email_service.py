@@ -87,7 +87,8 @@ def send_order_confirmation(order_dict, pdf_path):
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
-        "api-key": BREVO_API_KEY
+        "api-key": BREVO_API_KEY,
+        "x-sib-api-key": BREVO_API_KEY
     }
 
     try:
