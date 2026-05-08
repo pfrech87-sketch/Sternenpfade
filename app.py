@@ -56,7 +56,10 @@ def test_email():
         'order_number': 'TEST-123',
         'customer_name': 'Test User',
         'customer_email': 'info@sternenpfade.at',
+        'customer_phone': '+43 123 456789',
+        'billing_address': 'Teststraße 1, 1234 Testort',
         'total_amount': 10.0,
+        'created_at': '2026-05-08',
         'items': [{'name': 'Test Artikel', 'price': 10.0, 'quantity': 1}]
     }
     from invoice_service import generate_invoice
