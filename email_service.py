@@ -92,13 +92,17 @@ def send_order_confirmation(order_dict, pdf_path):
 
     try:
         print(f"Connecting to SMTP server {SMTP_SERVER}:{SMTP_PORT}...")
-        if SMTP_PORT == 465:
-            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=10)
+        if int(SMTP_PORT) == 465:
+            server = smtplib.SMTP_SSL(SMTP_SERVER, int(SMTP_PORT), timeout=15)
         else:
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
+            server = smtplib.SMTP(SMTP_SERVER, int(SMTP_PORT), timeout=15)
+            print("Starting EHLO...")
+            server.ehlo()
+            print("Starting STARTTLS...")
             server.starttls()
+            server.ehlo()
             
-        print("Logging in...")
+        print(f"Logging in as {SMTP_USERNAME}...")
         server.login(SMTP_USERNAME, SMTP_PASSWORD)
         print("Sending message...")
         server.send_message(msg)
@@ -106,7 +110,7 @@ def send_order_confirmation(order_dict, pdf_path):
         print(f"Successfully sent confirmation email to {customer_email}")
         return True
     except Exception as e:
-        print(f"Failed to send email: {e}")
+        print(f"Detailed SMTP Error: {e}")
         return False
 
 def send_digital_delivery(order_dict):
@@ -160,13 +164,17 @@ def send_digital_delivery(order_dict):
 
     try:
         print(f"Connecting to SMTP server {SMTP_SERVER}:{SMTP_PORT}...")
-        if SMTP_PORT == 465:
-            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=10)
+        if int(SMTP_PORT) == 465:
+            server = smtplib.SMTP_SSL(SMTP_SERVER, int(SMTP_PORT), timeout=15)
         else:
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
+            server = smtplib.SMTP(SMTP_SERVER, int(SMTP_PORT), timeout=15)
+            print("Starting EHLO...")
+            server.ehlo()
+            print("Starting STARTTLS...")
             server.starttls()
+            server.ehlo()
             
-        print("Logging in...")
+        print(f"Logging in as {SMTP_USERNAME}...")
         server.login(SMTP_USERNAME, SMTP_PASSWORD)
         print("Sending message...")
         server.send_message(msg)
