@@ -7,7 +7,7 @@ from email.mime.base import MIMEBase
 from email import encoders
 
 # SMTP Konfiguration für Webador
-SMTP_SERVER = "smtp.webador.com"
+SMTP_SERVER = "mail.webador.com"
 SMTP_USER = "info@sternenpfade.at"
 SMTP_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 
@@ -38,29 +38,20 @@ def _create_message(to_email, subject, body_parts):
     return msg
 
 def _send_via_smtp(msg):
-    """Hilfsfunktion zum Versenden über verschiedene Ports"""
+    """Hilfsfunktion zum Versenden über STARTTLS (Port 587)"""
     if not SMTP_PASSWORD:
         print("Fehler: EMAIL_PASSWORD nicht gesetzt.")
         return False
 
-    # Wir probieren Port 465 (SSL) und 587 (STARTTLS)
-    for port in [465, 587]:
-        try:
-            if port == 465:
-                with smtplib.SMTP_SSL(SMTP_SERVER, port, timeout=15) as server:
-                    server.login(SMTP_USER, SMTP_PASSWORD)
-                    server.send_message(msg)
-                    return True
-            else:
-                with smtplib.SMTP(SMTP_SERVER, port, timeout=15) as server:
-                    server.starttls()
-                    server.login(SMTP_USER, SMTP_PASSWORD)
-                    server.send_message(msg)
-                    return True
-        except Exception as e:
-            print(f"Versand über Port {port} fehlgeschlagen: {e}")
-            continue
-    return False
+    try:
+        with smtplib.SMTP(SMTP_SERVER, 587, timeout=15) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.send_message(msg)
+            return True
+    except Exception as e:
+        print(f"Versand über Port 587 fehlgeschlagen: {e}")
+        return False
 
 def send_order_confirmation(order_dict, pdf_path):
     customer_email = str(order_dict.get('customer_email', '')).strip()
