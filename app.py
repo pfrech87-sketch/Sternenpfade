@@ -19,7 +19,15 @@ init_db()
 app = Flask(__name__, 
             static_folder=os.path.dirname(os.path.abspath(__file__)), 
             static_url_path='/')
-CORS(app)  # Enable CORS for all routes (since frontend is on same origin or different port in dev)
+CORS(app)
+
+# --- SYSTEM-CHECK BEIM START ---
+email_pw = os.environ.get('EMAIL_PASSWORD', '')
+if not email_pw:
+    print("[SYSTEM-CHECK] FEHLER: EMAIL_PASSWORD wurde NICHT gefunden!")
+else:
+    print(f"[SYSTEM-CHECK] OK: EMAIL_PASSWORD gefunden (Länge: {len(email_pw)} Zeichen)")
+# ------------------------------
 
 @app.route('/')
 def index():
@@ -148,17 +156,24 @@ def checkout():
         email_success = send_order_confirmation(order_dict, pdf_path)
         print(f"Email sending result: {email_success}")
         
-        return jsonify({
-            'success': True,
-            'message': 'Order created successfully',
-            'order_id': order_id,
-            'order_number': order_number
-        }), 201
-        
+        if email_success:
+            return jsonify({
+                'success': True,
+                'message': 'Order created successfully',
+                'order_id': order_id,
+                'order_number': order_number
+            }), 201
+        else:
+            return jsonify({
+                'error': 'E-Mail Versand fehlgeschlagen. Bitte prüfe deine E-Mail Adresse oder kontaktiere uns direkt.',
+                'order_number': order_number
+            }), 500
+            
     except Exception as e:
         conn.rollback()
-        print(f"Error in checkout: {e}")
-        return jsonify({'error': 'Failed to process order'}), 500
+        error_msg = str(e)
+        print(f"Error in checkout: {error_msg}")
+        return jsonify({'error': f'Fehler bei der Bestellung: {error_msg}'}), 500
     finally:
         conn.close()
 

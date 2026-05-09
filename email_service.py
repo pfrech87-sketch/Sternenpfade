@@ -7,8 +7,9 @@ from email.mime.base import MIMEBase
 from email import encoders
 
 # SMTP Konfiguration für Webador
+# Wir wechseln auf Port 587 (STARTTLS), da dieser in Cloud-Umgebungen stabiler ist
 SMTP_SERVER = "smtp.webador.com"
-SMTP_PORT = 465 # SSL Port
+SMTP_PORT = 587 
 SMTP_USER = "info@sternenpfade.at"
 SMTP_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 
@@ -26,7 +27,7 @@ def send_order_confirmation(order_dict, pdf_path):
     customer_name = str(order_dict.get('customer_name', '')).strip()
     
     if not customer_email:
-        print("Fehler: Keine Kunden-E-Mail-Adresse.")
+        print("Fehler: Keine Kunden-E-Mail.")
         return False
 
     if not SMTP_PASSWORD:
@@ -98,21 +99,29 @@ def send_order_confirmation(order_dict, pdf_path):
             print(f"Anhang-Fehler: {e}")
 
     try:
-        print(f"Sende Mail an {customer_email}...")
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+        print(f"Versuche E-Mail via Webador (Port 587) an {customer_email} zu senden...")
+        # Timeout von 15 Sekunden, damit der Server nicht hängen bleibt
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=15) as server:
+            server.starttls() # Verschlüsselung aktivieren
             server.login(SMTP_USER, SMTP_PASSWORD)
             server.send_message(msg)
             
-            # Kopie an Admin
-            admin_msg = msg
+            # Kurze Pause für den Server (manche Provider brauchen das)
+            import time
+            time.sleep(1)
+
+            # Kopie an Admin separat senden
+            admin_msg = MIMEMultipart('alternative')
+            admin_msg['From'] = f"{SENDER_NAME} <{SMTP_USER}>"
             admin_msg['To'] = SMTP_USER
-            admin_msg['Subject'] = f"[KOPIE] {subject}"
+            admin_msg['Subject'] = f"[ADMIN-KOPIE] {subject}"
+            admin_msg.attach(MIMEText(f"Kopie der Bestellung für {customer_name} ({customer_email})\n\n" + text_content, 'plain'))
             server.send_message(admin_msg)
             
-        print("Senden erfolgreich!")
+        print("Versand über SMTP erfolgreich.")
         return True
     except Exception as e:
-        print(f"SMTP-Fehler: {e}")
+        print(f"Detaillierter SMTP-Fehler: {e}")
         return False
 
 def send_digital_delivery(order_dict):
@@ -138,7 +147,8 @@ def send_digital_delivery(order_dict):
     msg.attach(MIMEText(text_content, 'plain'))
     msg.attach(MIMEText(html_content, 'html'))
     try:
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=15) as server:
+            server.starttls()
             server.login(SMTP_USER, SMTP_PASSWORD)
             server.send_message(msg)
         return True
