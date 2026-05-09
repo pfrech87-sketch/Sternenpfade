@@ -16,11 +16,6 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 2rem;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
         }
         .checkout-form {
             display: flex;
@@ -114,12 +109,16 @@
     }
     </script>
     </head>
-<body class="theme-dark">
+<body>
+    <!-- Background Elements -->
+    <div class="cosmic-bg"></div>
+    <div class="cosmic-overlay"></div>
+
     <!-- Header/Nav -->
     <header class="main-header">
-        <nav class="nav-container">
+        <nav class="nav-container" style="justify-content: space-between; padding: 0 1rem;">
             <a href="index.html" class="logo"><img src="assets/logo-wei.png" alt="Sternenpfade Logo" style="height: 40px;"></a>
-            <a href="booking.html" style="color: var(--c-white); text-decoration: none;">&larr; Zurück</a>
+            <a href="booking.html" style="color: var(--c-white); text-decoration: none; font-weight: 500;">&larr; Zurück</a>
         </nav>
     </header>
 
@@ -137,12 +136,15 @@
                 <a href="booking.html" class="btn btn-primary" style="margin-top: 1rem;">Zurück zur Übersicht</a>
             </div>
 
-            <div class="checkout-grid" id="checkoutFormContainer">
+            <div class="checkout-grid glass-card" id="checkoutFormContainer">
                 <div class="order-summary">
                     <h3>Deine Auswahl</h3>
-                    <div class="summary-item">
-                        <span id="itemNameDisplay">Lade...</span>
-                        <span id="itemPriceDisplay">€ 0,00</span>
+                    <div class="summary-item" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <img id="itemImageDisplay" src="" alt="Produktbild" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; display: none; border: 1px solid rgba(255,255,255,0.1);">
+                            <span id="itemNameDisplay" style="font-weight: 500;">Lade...</span>
+                        </div>
+                        <span id="itemPriceDisplay" style="color: var(--c-gold); font-weight: 600;">€ 0,00</span>
                     </div>
                     <div class="summary-total">
                         <span>Gesamt</span>
@@ -150,6 +152,14 @@
                     </div>
                     <div class="payment-info">
                         <strong>Zahlungsmethode:</strong> Überweisung, Vorkasse
+                    </div>
+                </div>
+
+                <div class="trust-box" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; margin-bottom: 0.5rem;">
+                    <img src="assets/patrick-trust.JPG" alt="Patrick Frech" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; object-position: center 30%; border: 2px solid var(--c-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); flex-shrink: 0;">
+                    <div>
+                        <h4 style="color: var(--c-gold); margin-bottom: 0.3rem; font-size: 1.1rem;">Persönliche Begleitung</h4>
+                        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); margin: 0; line-height: 1.4;">Ich freue mich darauf, dich und dein Tier auf eurem Weg zu begleiten. Deine Daten sind bei mir absolut sicher und werden streng vertraulich behandelt.</p>
                     </div>
                 </div>
 
@@ -163,8 +173,9 @@
                         <input type="email" id="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="phone">Telefonnummer</label>
-                        <input type="tel" id="phone">
+                        <label for="phone">Telefonnummer *</label>
+                        <input type="tel" id="phone" required>
+                        <small style="color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-top: 0.4rem; line-height: 1.4; display: block;">📞 Deine Telefonnummer wird nur verwendet, um bei Bedarf den Austausch zu Foto und Name deines Tieres 🐶🐱🐴 zu ermöglichen – zum Beispiel, falls eine E-Mail nicht zugestellt werden kann.</small>
                     </div>
                     <div class="form-group">
                         <label for="address">Rechnungsadresse *</label>
@@ -185,6 +196,28 @@
             const urlParams = new URLSearchParams(window.location.search);
             const itemName = urlParams.get('item') || 'Unbekannter Artikel';
             const itemPrice = parseFloat(urlParams.get('price')) || 0;
+
+            const imageMap = {
+                'Schamanische Tierkommunikation': 'assets/Tierkommunkation-shop.jpeg',
+                'Jenseitskontakt fuer Tiere': 'assets/Jenseits-kategorie.jpeg',
+                'Seelenfeld Kompass Duo-Coaching': 'assets/kompass_mid.png',
+                'Kraftsegen fuer Tiere': 'assets/kraftsegen_mid.png',
+                'Soul Link': 'assets/soul_link_augen_nebula_1776884702696.png',
+                '1 Frage 1 Antwort': 'assets/frage_antwort_mid.png',
+                'Sternenpfade Lebensbegleitung': 'assets/lebensbegleitung_soft.png',
+                'Sternenlicht-Begleitung': 'assets/sternenlicht_soft.png',
+                'Schamanisches Sternzeichen Orakel': 'assets/orakel_soft.png',
+                'Der Pfad zur Tierkommunikation': 'assets/pfad_kurs_soft.png',
+                'Heilreise mit Anubis': 'assets/anubis_meditation_soft.png',
+                'Zurueck in deine Mitte': 'assets/mitte_soft.png',
+                'Gratis Download Herzens-Verstaendnis': 'assets/herz_download_soft.png'
+            };
+
+            const itemImage = document.getElementById('itemImageDisplay');
+            if (imageMap[itemName]) {
+                itemImage.src = imageMap[itemName];
+                itemImage.style.display = 'block';
+            }
 
             document.getElementById('itemNameDisplay').textContent = itemName;
             document.getElementById('itemPriceDisplay').textContent = itemPrice === 0 ? 'Gratis' : `€ ${itemPrice.toFixed(2).replace('.', ',')}`;
