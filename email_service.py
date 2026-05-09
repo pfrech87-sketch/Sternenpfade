@@ -13,6 +13,7 @@ SMTP_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 
 SENDER_NAME = "Sternenpfade"
 
+# Mapping der digitalen Produkte
 DIGITAL_PRODUCTS = {
     "Gratis Download: Herzens-Verständnis": "https://www.sternenpfade.at/downloads/herzens-verstaendnis.pdf",
     "Gratis Download Herzens-Verstaendnis": "https://www.sternenpfade.at/downloads/herzens-verstaendnis.pdf",
@@ -20,17 +21,52 @@ DIGITAL_PRODUCTS = {
     "Zurueck in deine Mitte": "https://www.sternenpfade.at/downloads/zurueck-in-deine-mitte.mp3"
 }
 
+def _create_message(to_email, subject, body_parts):
+    """Hilfsfunktion zum Erstellen einer Multipart-E-Mail (HTML & Text)"""
+    text_content = "\n".join(body_parts)
+    html_content = "<html><body style='font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px;'>" + \
+                   "<br/>".join(body_parts).replace("\n", "<br/>") + \
+                   "</body></html>"
+
+    msg = MIMEMultipart('alternative')
+    msg['From'] = f"{SENDER_NAME} <{SMTP_USER}>"
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(text_content, 'plain'))
+    msg.attach(MIMEText(html_content, 'html'))
+    return msg
+
+def _send_via_smtp(msg):
+    """Hilfsfunktion zum Versenden über verschiedene Ports"""
+    if not SMTP_PASSWORD:
+        print("Fehler: EMAIL_PASSWORD nicht gesetzt.")
+        return False
+
+    # Wir probieren Port 465 (SSL) und 587 (STARTTLS)
+    for port in [465, 587]:
+        try:
+            if port == 465:
+                with smtplib.SMTP_SSL(SMTP_SERVER, port, timeout=15) as server:
+                    server.login(SMTP_USER, SMTP_PASSWORD)
+                    server.send_message(msg)
+                    return True
+            else:
+                with smtplib.SMTP(SMTP_SERVER, port, timeout=15) as server:
+                    server.starttls()
+                    server.login(SMTP_USER, SMTP_PASSWORD)
+                    server.send_message(msg)
+                    return True
+        except Exception as e:
+            print(f"Versand über Port {port} fehlgeschlagen: {e}")
+            continue
+    return False
+
 def send_order_confirmation(order_dict, pdf_path):
     customer_email = str(order_dict.get('customer_email', '')).strip()
     customer_name = str(order_dict.get('customer_name', '')).strip()
     
-    if not customer_email:
-        print("Fehler: Keine Kunden-E-Mail.")
-        return False
-
-    if not SMTP_PASSWORD:
-        print("Fehler: EMAIL_PASSWORD Umgebungsvariable fehlt.")
-        return False
+    if not customer_email: return False
 
     items = order_dict.get('items', [])
     download_links = []
@@ -41,13 +77,15 @@ def send_order_confirmation(order_dict, pdf_path):
         if name in DIGITAL_PRODUCTS and is_free_order:
             download_links.append((name, DIGITAL_PRODUCTS[name]))
 
-    subject = f"Bestellbestätigung - Sternenpfade (Bestellnummer: {order_dict.get('order_number')})"
+    subject = f"Bestellbestätigung - Sternenpfade (Nr. {order_dict.get('order_number')})"
 
-    greeting = f"Hallo {customer_name},"
-    thanks = "vielen lieben Dank für deine Bestellung bei Sternenpfade 🤍💙✨"
-    main_text = "dein gewünschter Download ist nun für dich bereit." if is_free_order else f"deine Bestellung Nr. {order_dict.get('order_number')} ist bei mir eingegangen."
+    body_parts = [
+        f"Hallo {customer_name},", "",
+        "vielen lieben Dank für deine Bestellung bei Sternenpfade 🤍💙✨",
+        "dein Download ist nun bereit." if is_free_order else f"deine Bestellung Nr. {order_dict.get('order_number')} ist eingegangen.",
+        ""
+    ]
 
-    body_parts = [greeting, "", thanks, main_text, ""]
     if download_links:
         body_parts.append("✨ DEINE DOWNLOADS:")
         for name, link in download_links:
@@ -55,11 +93,12 @@ def send_order_confirmation(order_dict, pdf_path):
         body_parts.append("")
 
     if not is_free_order:
-        body_parts.append("Im Anhang findest du deine Rechnung zur Bestellung als PDF-Datei.")
-        body_parts.append("")
-        body_parts.append("Bitte überweise den Rechnungsbetrag vorab auf das auf der Rechnung angegebene Konto.")
-        body_parts.append("Sobald die Zahlung eingelangt ist, beginne ich mit der Bearbeitung deiner Bestellung.")
-        body_parts.append("")
+        body_parts.extend([
+            "Im Anhang findest du deine Rechnung als PDF-Datei.",
+            "Bitte überweise den Betrag vorab auf das auf der Rechnung angegebene Konto.",
+            "Sobald die Zahlung eingelangt ist, beginne ich mit der Bearbeitung.",
+            ""
+        ])
     
     body_parts.extend([
         "Wenn es sich um eine Tierkommunikation oder einen Jenseitskontakt handelt, nehme ich mir dafür bewusst Zeit.",
@@ -72,19 +111,9 @@ def send_order_confirmation(order_dict, pdf_path):
         "✨ www.sternenpfade.at"
     ])
 
-    text_content = "\n".join(body_parts)
-    html_content = "<html><body style='font-family: sans-serif; line-height: 1.5; color: #333;'>" + \
-                   "<br/>".join(body_parts).replace("\n", "<br/>") + \
-                   "</body></html>"
+    msg = _create_message(customer_email, subject, body_parts)
 
-    msg = MIMEMultipart('alternative')
-    msg['From'] = f"{SENDER_NAME} <{SMTP_USER}>"
-    msg['To'] = customer_email
-    msg['Subject'] = subject
-
-    msg.attach(MIMEText(text_content, 'plain'))
-    msg.attach(MIMEText(html_content, 'html'))
-
+    # Rechnung anhängen
     if pdf_path and os.path.exists(pdf_path):
         try:
             with open(pdf_path, "rb") as f:
@@ -96,42 +125,47 @@ def send_order_confirmation(order_dict, pdf_path):
         except Exception as e:
             print(f"Anhang-Fehler: {e}")
 
-    # Wir versuchen es nacheinander mit verschiedenen Ports
-    ports_to_try = [465, 587]
+    # Senden
+    success = _send_via_smtp(msg)
     
-    for port in ports_to_try:
+    # Kopie an dich selbst senden
+    if success:
         try:
-            print(f"Versuche E-Mail via Webador (Port {port}) an {customer_email} zu senden...")
-            if port == 465:
-                server = smtplib.SMTP_SSL(SMTP_SERVER, port, timeout=10)
-            else:
-                server = smtplib.SMTP(SMTP_SERVER, port, timeout=10)
-                server.starttls()
-            
-            # Debug-Level auf 1 setzen, um den kompletten Dialog im Log zu sehen
-            server.set_debuglevel(1)
-            
-            server.login(SMTP_USER, SMTP_PASSWORD)
-            server.send_message(msg)
-            
-            # Admin-Kopie
-            admin_msg = MIMEMultipart('alternative')
-            admin_msg['From'] = f"{SENDER_NAME} <{SMTP_USER}>"
-            admin_msg['To'] = SMTP_USER
-            admin_msg['Subject'] = f"[ADMIN-KOPIE] {subject}"
-            admin_msg.attach(MIMEText(text_content, 'plain'))
-            server.send_message(admin_msg)
-            
-            server.quit()
-            print(f"Versand über SMTP (Port {port}) erfolgreich.")
-            return True
-        except Exception as e:
-            print(f"Fehler auf Port {port}: {e}")
-            continue # Nächsten Port probieren
-            
-    print("Alle SMTP-Versuche sind fehlgeschlagen.")
-    return False
+            admin_msg = _create_message(SMTP_USER, f"[KOPIE] {subject}", body_parts)
+            _send_via_smtp(admin_msg)
+        except: pass
+        
+    return success
 
 def send_digital_delivery(order_dict):
-    # Ähnliche Logik wie oben für die spätere digitale Auslieferung
-    pass
+    customer_email = str(order_dict.get('customer_email', '')).strip()
+    customer_name = str(order_dict.get('customer_name', '')).strip()
+    
+    items = order_dict.get('items', [])
+    download_links = []
+    for item in items:
+        name = item.get('name', item.get('item_name', ''))
+        if name in DIGITAL_PRODUCTS:
+            download_links.append((name, DIGITAL_PRODUCTS[name]))
+
+    if not download_links: return False 
+
+    body_parts = [
+        f"Hallo {customer_name},", "",
+        "vielen Dank für deine Zahlung! Deine Downloads sind nun für dich bereit:",
+        ""
+    ]
+    for name, link in download_links:
+        body_parts.append(f"✨ {name}: {link}")
+    
+    body_parts.extend([
+        "",
+        "Ich wünsche dir viel Freude und tiefe Erkenntnisse damit.",
+        "",
+        "Herzensgruß",
+        "Patrick",
+        "✨ www.sternenpfade.at"
+    ])
+
+    msg = _create_message(customer_email, f"Deine Downloads - Sternenpfade (Bestellung {order_dict.get('order_number')})", body_parts)
+    return _send_via_smtp(msg)
