@@ -1,12 +1,21 @@
 import os
-import requests
+import smtplib
 import base64
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
-BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
-SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'info@sternenpfade.at')
+# SMTP Konfiguration für Webador
+SMTP_SERVER = "smtp.webador.com"
+SMTP_PORT = 465 # SSL Port
+SMTP_USER = "info@sternenpfade.at"
+# Das Passwort wird sicher aus den Umgebungsvariablen geladen
+SMTP_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+
 SENDER_NAME = "Sternenpfade"
 
-# Mapping of product names to their download links
+# Mapping der digitalen Produkte zu ihren Download-Links
 DIGITAL_PRODUCTS = {
     "Gratis Download: Herzens-Verständnis": "https://www.sternenpfade.at/downloads/herzens-verstaendnis.pdf",
     "Gratis Download Herzens-Verstaendnis": "https://www.sternenpfade.at/downloads/herzens-verstaendnis.pdf",
@@ -19,11 +28,11 @@ def send_order_confirmation(order_dict, pdf_path):
     customer_name = str(order_dict.get('customer_name', '')).strip()
     
     if not customer_email:
-        print("No customer email provided. Skipping email sending.")
+        print("Fehler: Keine Kunden-E-Mail-Adresse vorhanden.")
         return False
 
-    if not BREVO_API_KEY:
-        print("BREVO_API_KEY not configured. Skipping email sending.")
+    if not SMTP_PASSWORD:
+        print("Fehler: EMAIL_PASSWORD ist nicht konfiguriert (Umgebungsvariable fehlt).")
         return False
 
     items = order_dict.get('items', [])
@@ -35,7 +44,10 @@ def send_order_confirmation(order_dict, pdf_path):
         if name in DIGITAL_PRODUCTS and is_free_order:
             download_links.append((name, DIGITAL_PRODUCTS[name]))
 
-    # Build the body
+    # Betreff erstellen
+    subject = f"Bestellbestätigung - Sternenpfade (Bestellnummer: {order_dict.get('order_number')})"
+
+    # Nachrichtenteile bauen
     greeting = f"Hallo {customer_name},"
     thanks = "vielen lieben Dank für deine Bestellung bei Sternenpfade 🤍💙✨"
     main_text = "dein gewünschter Download ist nun für dich bereit." if is_free_order else f"deine Bestellung Nr. {order_dict.get('order_number')} ist bei mir eingegangen."
@@ -65,56 +77,60 @@ def send_order_confirmation(order_dict, pdf_path):
         "✨ www.sternenpfade.at"
     ])
 
-    content = "<br/>".join(body_parts).replace("\n", "<br/>")
+    text_content = "\n".join(body_parts)
+    html_content = "<html><body style='font-family: sans-serif; line-height: 1.5; color: #333;'>" + \
+                   "<br/>".join(body_parts).replace("\n", "<br/>") + \
+                   "</body></html>"
 
-    # Prepare Attachment
-    attachments = []
+    # E-Mail Objekt erstellen
+    msg = MIMEMultipart('alternative')
+    msg['From'] = f"{SENDER_NAME} <{SMTP_USER}>"
+    msg['To'] = customer_email
+    msg['Subject'] = subject
+
+    # Text und HTML hinzufügen
+    msg.attach(MIMEText(text_content, 'plain'))
+    msg.attach(MIMEText(html_content, 'html'))
+
+    # PDF Anhang hinzufügen
     if pdf_path and os.path.exists(pdf_path):
         try:
             with open(pdf_path, "rb") as f:
-                b64_content = base64.b64encode(f.read()).decode()
-                attachments.append({
-                    "content": b64_content,
-                    "name": os.path.basename(pdf_path)
-                })
+                part = MIMEBase("application", "octet-stream")
+                part.set_payload(f.read())
+                encoders.encode_base64(part)
+                part.add_header(
+                    "Content-Disposition",
+                    f"attachment; filename={os.path.basename(pdf_path)}",
+                )
+                msg.attach(part)
         except Exception as e:
-            print(f"Error reading PDF for attachment: {e}")
+            print(f"Fehler beim Anhängen der PDF: {e}")
 
-    # Brevo API Payload
-    payload = {
-        "sender": {"name": SENDER_NAME, "email": SENDER_EMAIL},
-        "to": [{"email": customer_email, "name": customer_name}],
-        "cc": [{"email": "info@sternenpfade.at", "name": "Sternenpfade Admin"}],
-        "replyTo": {"email": SENDER_EMAIL, "name": SENDER_NAME},
-        "subject": f"Bestellbestätigung - Sternenpfade (Bestellnummer: {order_dict.get('order_number')})",
-        "htmlContent": f"<html><body>{content}</body></html>",
-        "attachment": attachments
-    }
-
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "api-key": BREVO_API_KEY
-    }
-
+    # E-Mail über SMTP senden
     try:
-        print(f"Sending order confirmation to {customer_email}...")
-        response = requests.post("https://api.brevo.com/v3/smtp/email", json=payload, headers=headers)
-        if response.status_code in [201, 200, 202]:
-            print(f"Successfully sent confirmation email via API to {customer_email}. Response: {response.text}")
-            return True
-        else:
-            print(f"Failed to send email via API. Status: {response.status_code}, Response: {response.text}")
-            return False
+        print(f"Versuche E-Mail via Webador-SMTP an {customer_email} zu senden...")
+        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.send_message(msg)
+            
+            # Kopie an den Admin senden (einfach noch einmal senden oder BCC nutzen)
+            # Hier senden wir eine Kopie an info@sternenpfade.at
+            msg['To'] = SMTP_USER
+            msg['Subject'] = f"[KOPIE] {subject}"
+            server.send_message(msg)
+            
+        print(f"E-Mail erfolgreich gesendet an {customer_email} und Kopie an Admin.")
+        return True
     except Exception as e:
-        print(f"Error sending email via API: {e}")
+        print(f"SMTP Fehler: {e}")
         return False
 
 def send_digital_delivery(order_dict):
     customer_email = str(order_dict.get('customer_email', '')).strip()
     customer_name = str(order_dict.get('customer_name', '')).strip()
     
-    if not customer_email or not BREVO_API_KEY:
+    if not customer_email or not SMTP_PASSWORD:
         return False
 
     items = order_dict.get('items', [])
@@ -150,30 +166,24 @@ def send_digital_delivery(order_dict):
         "✨ www.sternenpfade.at"
     ])
 
-    content = "<br/>".join(body_parts).replace("\n", "<br/>")
+    text_content = "\n".join(body_parts)
+    html_content = "<html><body style='font-family: sans-serif; line-height: 1.5; color: #333;'>" + \
+                   "<br/>".join(body_parts).replace("\n", "<br/>") + \
+                   "</body></html>"
 
-    payload = {
-        "sender": {"name": SENDER_NAME, "email": SENDER_EMAIL},
-        "to": [{"email": customer_email, "name": customer_name}],
-        "replyTo": {"email": SENDER_EMAIL, "name": SENDER_NAME},
-        "subject": f"Deine Downloads von Sternenpfade - Bestellung {order_dict.get('order_number')}",
-        "htmlContent": f"<html><body>{content}</body></html>"
-    }
+    msg = MIMEMultipart('alternative')
+    msg['From'] = f"{SENDER_NAME} <{SMTP_USER}>"
+    msg['To'] = customer_email
+    msg['Subject'] = f"Deine Downloads von Sternenpfade - Bestellung {order_dict.get('order_number')}"
 
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "api-key": BREVO_API_KEY
-    }
+    msg.attach(MIMEText(text_content, 'plain'))
+    msg.attach(MIMEText(html_content, 'html'))
 
     try:
-        response = requests.post("https://api.brevo.com/v3/smtp/email", json=payload, headers=headers)
-        if response.status_code in [201, 200, 202]:
-            print(f"Successfully sent digital delivery to {customer_email}")
-            return True
-        else:
-            print(f"Failed to send digital delivery. Status: {response.status_code}, Response: {response.text}")
-            return False
+        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.send_message(msg)
+        return True
     except Exception as e:
-        print(f"Error sending digital delivery: {e}")
+        print(f"Fehler bei digitaler Auslieferung: {e}")
         return False
