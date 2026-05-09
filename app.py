@@ -144,7 +144,9 @@ def checkout():
         pdf_path = generate_invoice(order_dict)
         
         # Send Order Confirmation Email
-        send_order_confirmation(order_dict, pdf_path)
+        print(f"Attempting to send confirmation email for order {order_number} to {order_dict.get('customer_email')}...")
+        email_success = send_order_confirmation(order_dict, pdf_path)
+        print(f"Email sending result: {email_success}")
         
         return jsonify({
             'success': True,
