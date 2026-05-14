@@ -1,46 +1,57 @@
-# Domain-Umzug: Webador zu Render
+# DNS-Umzug: Webador zu Render (Backup & Übersicht)
 
-Diese Dokumentation beschreibt die finalen Schritte, um deine Domain `sternenpfade.at` von Webador auf deinen neuen Render-Server umzuleiten, **ohne** dass dein E-Mail-Postfach (`info@sternenpfade.at`) beeinträchtigt wird.
+Diese Datei dient als **Sicherheits-Backup** deiner DNS-Einstellungen bei Webador für den Go-Live auf Render. Falls etwas schiefgeht, kannst du anhand der "ALT"-Werte den ursprünglichen Zustand jederzeit wiederherstellen.
 
-Sobald du mit dem Testen fertig bist und live gehen möchtest, folge dieser Anleitung.
+---
 
-## Vorbereitung: Die Daten von Render holen
-1. Logge dich in dein [Render Dashboard](https://dashboard.render.com) ein.
-2. Klicke auf deinen Web Service (Sternenpfade).
-3. Gehe im linken Menü auf **"Settings"** und scrolle runter zu **"Custom Domains"**.
-4. Klicke auf **"Add Custom Domain"**, trage `sternenpfade.at` ein und bestätige (am besten auch für `www.sternenpfade.at`).
-5. Render zeigt dir nun ein Fenster mit den benötigten Ziel-Werten an. Lass dieses Fenster einfach offen.
+## ❌ Diese Einträge werden GELÖSCHT (Papierkorb)
+Diese beiden Einträge verweisen auf den alten Webador-Baukasten und müssen gelöscht werden, damit Render übernehmen kann.
 
-## Hauptschritt: DNS-Einträge bei Webador ändern
-Jetzt musst du Webador mitteilen, dass die Website ab sofort bei Render läuft.
-
-1. Logge dich in dein **Webador Konto** ein.
-2. Gehe in die **Einstellungen** deiner Domain/Website.
-3. Suche den Bereich **"DNS-Einstellungen"** (manchmal auch "Erweiterte Domain-Einstellungen" oder "DNS-Verwaltung").
-4. Du siehst nun eine Tabelle mit verschiedenen DNS-Records.
-
-**WICHTIG für deine E-Mails:**
-Ändere oder lösche **NIEMALS** die Einträge vom Typ `MX` oder `TXT` (SPF). Diese sind dafür verantwortlich, dass du weiterhin E-Mails über `info@sternenpfade.at` empfangen und versenden kannst!
-
-### 1. Den WWW-Eintrag setzen (CNAME)
-Suche nach einem bestehenden Eintrag für `www` oder lege einen neuen an:
-* **Typ:** `CNAME`
-* **Name / Hostname:** `www`
-* **Wert / Ziel:** `sternenpfade.onrender.com`
-
-### 2. Den Haupt-Eintrag setzen (A-Record)
-Suche nach einem bestehenden A-Record, der als Hostname `@` hat (oder leer ist) und auf die alte Webador-IP (z.B. `35.204.150.5`) zeigt. **Lösche diesen alten A-Record.**
-Lege dann den neuen an:
+**1. Die alte Haupt-IP (A-Record)**
 * **Typ:** `A`
-* **Name / Hostname:** `@` *(oder leer lassen, falls Webador kein @ akzeptiert)*
-* **Wert / Ziel:** `216.24.57.1` *(Das ist die IP-Adresse von Render)*
+* **Name:** *(leer)*
+* **Wert:** `35.204.150.5`
 
-## Abschluss: Geduld und Verifizierung
-1. Speichere die Einstellungen bei Webador.
-2. Gehe zurück zum offenen Fenster bei Render und klicke auf **"Verify"**.
-3. **Wartezeit einplanen:** DNS-Änderungen greifen selten in der ersten Sekunde. Es kann **15 Minuten bis hin zu 24 Stunden** dauern, bis alle Internet-Server weltweit die neue Adresse gelernt haben.
-4. Render wird den Status erst auf "Not verified" oder "Pending" setzen. Das ist normal!
-5. Lade die Render-Seite nach einer Weile neu. Sobald dort ein grünes **"Verified"** steht, ist der Umzug erfolgreich abgeschlossen.
-6. Render generiert dann automatisch das SSL-Zertifikat (das Schloss-Symbol) für dich.
+**2. Der alte Sternchen-Eintrag (Subdomains)**
+* **Typ:** `CNAME`
+* **Name:** `*`
+* **Wert:** `website-rendering.webador.com`
 
-Deine neue Website ist ab dann sicher unter `https://sternenpfade.at` erreichbar!
+---
+
+## ✅ Diese Einträge kommen NEU hinzu (+ Datensatz hinzufügen)
+Diese beiden Einträge leiten den Website-Verkehr (ohne www und mit www) auf deinen neuen Render-Server um.
+
+**1. Die neue Haupt-IP (A-Record für sternenpfade.at)**
+* **Typ:** `A`
+* **Name:** *(leer)*
+* **Wert:** `216.24.57.1` *(Die Render-IP)*
+
+**2. Die Weiterleitung für www (CNAME für www.sternenpfade.at)**
+* **Typ:** `CNAME`
+* **Name:** `www`
+* **Wert:** `sternenpfade.onrender.com` *(Ersetze dies durch deinen exakten Render-Link, falls er anders lautet)*
+
+---
+
+## 🛡️ Diese Einträge bleiben UNBERÜHRT (Nicht anfassen!)
+Alle folgenden Einträge sind zwingend für den E-Mail-Verkehr (`info@sternenpfade.at`) erforderlich. Wenn diese geändert werden, kommen keine Rechnungen oder Buchungsbestätigungen mehr an!
+
+* `MX` | *(leer)* | `mail.webador.com`
+* `TXT` | *(leer)* | `v=spf1 include:_spf.webador.com ~all`
+* `TXT` | `_dmarc` | `v=DMARC1; p=none`
+* `TXT` | `mandrill._domainkey` | `v=DKIM1; k=rsa; p=...`
+* `CNAME` | `mail` | `mail.webador.com`
+* `CNAME` | `autodiscover` | `block.mail.webador.com`
+* `CNAME` | `autoconfig` | `autoconfig.mail.webador.com`
+* `CNAME` | `sparkpost._domainkey` | `sparkpost._domainkey.webador.com`
+* `CNAME` | `jouwweb._domainkey` | `website-rendering._domainkey.jouwweb.nl`
+* `SRV` | `_autodiscover._tcp` | `0 443 autoconfig.mail.webador.com`
+
+---
+
+## Nächste Schritte nach der Änderung
+1. Webador-Einstellungen speichern.
+2. In Render einloggen -> Web Service anklicken -> Settings -> Custom Domains.
+3. `sternenpfade.at` und `www.sternenpfade.at` hinzufügen und auf **Verify** klicken.
+4. Geduld haben (es kann ein paar Stunden dauern, bis Render das grüne "Verified" anzeigt).

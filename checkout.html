@@ -6,6 +6,15 @@
     <title>Kasse - Sternenpfade</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-01655G61T2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-01655G61T2');
+    </script>
     <style>
         .checkout-section {
             padding: 8rem 2rem 4rem;
@@ -72,6 +81,11 @@
             border-radius: 8px;
             font-size: 0.9rem;
             color: rgba(255,255,255,0.8);
+        }
+        @media (max-width: 900px) {
+            .checkout-section {
+                padding: 6rem 1rem 3rem;
+            }
         }
     </style>
 
@@ -191,6 +205,7 @@
         </section>
     </main>
 
+    <script src="js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -260,6 +275,20 @@
                         document.getElementById('successMessage').style.display = 'block';
                         document.getElementById('successOrderNumber').textContent = result.order_number;
                         
+                        // Google Analytics 4 / Google Ads Conversion Tracking
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'purchase', {
+                                transaction_id: result.order_number,
+                                value: itemPrice,
+                                currency: 'EUR',
+                                items: [{
+                                    item_name: itemName,
+                                    price: itemPrice,
+                                    quantity: 1
+                                }]
+                            });
+                        }
+
                         if (itemPrice === 0) {
                             document.getElementById('successMessage').querySelector('p:nth-of-type(2)').innerHTML = 
                                 'Du erhältst in Kürze eine E-Mail mit deinem Download-Link. Viel Freude damit!';

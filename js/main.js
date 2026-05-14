@@ -99,4 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // 5. FAQ Accordion Logic
+    document.querySelectorAll('.faq-question').forEach(button => {
+        button.addEventListener('click', () => {
+            const item = button.closest('.faq-item');
+            
+            // Optional: Close all others
+            document.querySelectorAll('.faq-item').forEach(other => {
+                if (other !== item) other.classList.remove('active');
+            });
+            
+            item.classList.toggle('active');
+        });
+    });
 });
