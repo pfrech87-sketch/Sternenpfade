@@ -108,8 +108,8 @@ def checkout():
         cursor.execute('''
             INSERT INTO orders (
                 order_number, customer_name, customer_email, customer_phone,
-                billing_address, shipping_address, notes, total_amount, payment_method, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                billing_address, shipping_address, notes, total_amount, payment_method, status, payment_status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             'TEMP', # Placeholder
             data['customer_name'],
@@ -120,7 +120,8 @@ def checkout():
             data.get('notes', ''),
             total_amount,
             'Kostenlos' if total_amount == 0 else data.get('payment_method', 'Überweisung, Vorkasse'),
-            'Abgeschlossen' if total_amount == 0 else 'Ausstehend'
+            'Erledigt' if total_amount == 0 else 'Offen',
+            'Bezahlt' if total_amount == 0 else 'Ausstehend'
         ))
         
         order_id = cursor.lastrowid
@@ -186,6 +187,7 @@ def get_orders():
     try:
         # Get query parameters for filtering
         status_filter = request.args.get('status')
+        payment_filter = request.args.get('payment_status')
         search_query = request.args.get('search')
         
         query = 'SELECT * FROM orders'
@@ -195,6 +197,10 @@ def get_orders():
         if status_filter:
             conditions.append('status = ?')
             params.append(status_filter)
+            
+        if payment_filter:
+            conditions.append('payment_status = ?')
+            params.append(payment_filter)
             
         if search_query:
             conditions.append('(customer_name LIKE ? OR order_number LIKE ?)')
@@ -232,6 +238,7 @@ def get_order(order_id):
 def update_order_status(order_id):
     data = request.json
     new_status = data.get('status')
+    new_payment_status = data.get('payment_status')
     
     if not new_status:
         return jsonify({'error': 'Status is required'}), 400
@@ -239,14 +246,19 @@ def update_order_status(order_id):
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
-        cursor.execute('UPDATE orders SET status = ? WHERE id = ?', (new_status, order_id))
+        
+        if new_payment_status:
+            cursor.execute('UPDATE orders SET status = ?, payment_status = ? WHERE id = ?', (new_status, new_payment_status, order_id))
+        else:
+            cursor.execute('UPDATE orders SET status = ? WHERE id = ?', (new_status, order_id))
+            
         if cursor.rowcount == 0:
             return jsonify({'error': 'Order not found'}), 404
             
         conn.commit()
         
-        # If status is set to 'Abgeschlossen', check if we need to send digital downloads
-        if new_status == 'Abgeschlossen':
+        # If status is set to 'Erledigt', check if we need to send digital downloads
+        if new_status == 'Erledigt':
             cursor.execute('SELECT * FROM orders WHERE id = ?', (order_id,))
             order_row = cursor.fetchone()
             if order_row:

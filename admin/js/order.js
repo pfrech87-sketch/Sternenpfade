@@ -31,7 +31,8 @@ function renderOrderDetails(order) {
     document.getElementById('customerEmail').textContent = order.customer_email;
     document.getElementById('billingAddress').innerHTML = `${order.customer_name}<br>${order.billing_address.replace(/\n/g, '<br>')}<br>${order.customer_phone || ''}`;
     
-    document.getElementById('orderStatusSelect').value = order.status;
+    document.getElementById('orderStatusSelect').value = order.status || 'Offen';
+    document.getElementById('paymentStatusSelect').value = order.payment_status || 'Ausstehend';
     document.getElementById('orderNotes').value = order.notes || '';
     
     // Items
@@ -73,6 +74,7 @@ function renderOrderDetails(order) {
 
 async function saveOrderStatus(orderId) {
     const newStatus = document.getElementById('orderStatusSelect').value;
+    const newPaymentStatus = document.getElementById('paymentStatusSelect').value;
     
     try {
         const response = await fetch(`/api/admin/orders/${orderId}/status`, {
@@ -80,7 +82,10 @@ async function saveOrderStatus(orderId) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ status: newStatus })
+            body: JSON.stringify({ 
+                status: newStatus,
+                payment_status: newPaymentStatus
+            })
         });
         
         if (!response.ok) throw new Error('Failed to update status');

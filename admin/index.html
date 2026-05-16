@@ -17,11 +17,14 @@
             <div class="search-filters">
                 <input type="text" id="searchInput" placeholder="Bestellungen suchen...">
                 <select id="statusFilter">
-                    <option value="">Status</option>
+                    <option value="">Alle (Bearbeitung)</option>
+                    <option value="Offen">Offen</option>
+                    <option value="Erledigt">Erledigt</option>
+                </select>
+                <select id="paymentFilter">
+                    <option value="">Alle (Zahlung)</option>
                     <option value="Ausstehend">Ausstehend</option>
                     <option value="Bezahlt">Bezahlt</option>
-                    <option value="Versandt">Versandt</option>
-                    <option value="Storniert">Storniert</option>
                 </select>
             </div>
         </div>
@@ -31,6 +34,7 @@
                 <thead>
                     <tr>
                         <th>Status</th>
+                        <th>Zahlung</th>
                         <th>Kunde</th>
                         <th>Datum</th>
                         <th>Zahlungsmethode</th>

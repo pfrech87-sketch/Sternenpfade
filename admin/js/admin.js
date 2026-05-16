@@ -2,16 +2,19 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchOrders();
 
     document.getElementById('statusFilter').addEventListener('change', fetchOrders);
+    document.getElementById('paymentFilter').addEventListener('change', fetchOrders);
     document.getElementById('searchInput').addEventListener('input', fetchOrders);
 });
 
 async function fetchOrders() {
     const status = document.getElementById('statusFilter').value;
+    const payment = document.getElementById('paymentFilter').value;
     const search = document.getElementById('searchInput').value;
     
     let url = '/api/admin/orders';
     const params = new URLSearchParams();
     if (status) params.append('status', status);
+    if (payment) params.append('payment_status', payment);
     if (search) params.append('search', search);
     
     if (params.toString()) {
@@ -51,6 +54,7 @@ function renderOrders(orders) {
 
         tr.innerHTML = `
             <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+            <td><span class="status-badge status-${order.payment_status || 'Ausstehend'}">${order.payment_status || 'Ausstehend'}</span></td>
             <td>${order.customer_name}</td>
             <td>${date}</td>
             <td>${order.payment_method}</td>

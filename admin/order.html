@@ -36,13 +36,21 @@
                 </div>
 
                 <div class="form-group row">
-                    <label>Bestellstatus</label>
+                    <label>Bearbeitungsstatus</label>
                     <div class="value">
                         <select id="orderStatusSelect">
+                            <option value="Offen">Offen</option>
+                            <option value="Erledigt">Erledigt</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label>Zahlungsstatus</label>
+                    <div class="value">
+                        <select id="paymentStatusSelect">
                             <option value="Ausstehend">Ausstehend</option>
                             <option value="Bezahlt">Bezahlt</option>
-                            <option value="Versandt">Versandt</option>
-                            <option value="Storniert">Storniert</option>
                         </select>
                     </div>
                 </div>
@@ -86,7 +94,7 @@
 
                 <div class="card action-card flex-between">
                     <button class="btn btn-red">Löschen</button>
-                    <button id="printInvoiceBtn" class="btn btn-default">📄 Drucken &darr;</button>
+                    <button id="printInvoiceBtn" class="btn btn-default">📄 Rechnung downloaden &darr;</button>
                 </div>
             </div>
         </div>
