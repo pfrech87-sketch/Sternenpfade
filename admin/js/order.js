@@ -62,14 +62,7 @@ function renderOrderDetails(order) {
     // Total
     document.getElementById('totalAmount').textContent = `€ ${order.total_amount.toFixed(2).replace('.', ',')}`;
     
-    // History
-    document.getElementById('historyStatus').textContent = order.status;
-    document.getElementById('paymentMethod').textContent = order.payment_method;
-    
-    const date = new Date(order.created_at).toLocaleDateString('de-AT', {
-        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-    document.getElementById('historyDate').textContent = date;
+
 }
 
 async function saveOrderStatus(orderId) {
@@ -91,7 +84,6 @@ async function saveOrderStatus(orderId) {
         if (!response.ok) throw new Error('Failed to update status');
         
         alert('Status erfolgreich gespeichert.');
-        document.getElementById('historyStatus').textContent = newStatus;
     } catch (error) {
         console.error('Error updating status:', error);
         alert('Fehler beim Speichern des Status.');
