@@ -126,7 +126,7 @@ def checkout():
         order_id = cursor.lastrowid
         
         # Update order number to a proper format
-        order_number = f"100{order_id}" # Starting at 1001
+        order_number = str(order_id) # Set to exact ID (e.g., 140)
         cursor.execute('UPDATE orders SET order_number = ? WHERE id = ?', (order_number, order_id))
         
         # Insert items
