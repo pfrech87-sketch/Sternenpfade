@@ -76,9 +76,10 @@ body {
     color: #fff;
 }
 
-.status-Bezahlt { background-color: #5bc0de; }
-.status-Ausstehend { background-color: #f0ad4e; }
-.status-Versandt { background-color: #5cb85c; }
+.status-Offen { background-color: #9e9e9e; } /* Grau */
+.status-Erledigt { background-color: #5cb85c; } /* Grün */
+.status-Bezahlt { background-color: #5cb85c; } /* Grün */
+.status-Ausstehend { background-color: #d9534f; } /* Rot */
 .status-Storniert { background-color: #d9534f; }
 
 .btn {
