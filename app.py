@@ -359,5 +359,16 @@ def get_order_invoice(order_id):
     finally:
         conn.close()
 
+@app.route('/api/admin/fix-db', methods=['POST'])
+@requires_auth
+def run_fix_database():
+    from fix_db import fix_database
+    success, logs = fix_database()
+    if success:
+        return jsonify({'success': True, 'message': 'Datenbank erfolgreich repariert!', 'logs': logs})
+    else:
+        return jsonify({'success': False, 'error': 'Fehler bei der Datenbankreparatur.', 'logs': logs}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
