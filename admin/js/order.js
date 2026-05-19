@@ -61,6 +61,22 @@ function renderOrderDetails(order) {
 
     // Total
     document.getElementById('totalAmount').textContent = `€ ${order.total_amount.toFixed(2).replace('.', ',')}`;
+
+    // Check if imported from old system
+    const printBtn = document.getElementById('printInvoiceBtn');
+    if (printBtn) {
+        if (order.notes && order.notes.includes('Import altes System')) {
+            printBtn.disabled = true;
+            printBtn.style.opacity = '0.5';
+            printBtn.style.cursor = 'not-allowed';
+            printBtn.textContent = '📄 Keine Rechnung (Altes System)';
+        } else {
+            printBtn.disabled = false;
+            printBtn.style.opacity = '1';
+            printBtn.style.cursor = 'pointer';
+            printBtn.textContent = '📄 Rechnung downloaden ↓';
+        }
+    }
     
 
 }

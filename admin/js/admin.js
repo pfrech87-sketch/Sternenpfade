@@ -53,10 +53,14 @@ function renderOrders(orders) {
         // Format Currency
         const total = `€ ${order.total_amount.toFixed(2).replace('.', ',')}`;
 
+        const importBadge = (order.notes && order.notes.includes('Import altes System')) 
+            ? '<span class="import-badge">Import</span>' 
+            : '';
+
         tr.innerHTML = `
             <td><span class="status-badge status-${order.status}">${order.status}</span></td>
             <td><span class="status-badge status-${order.payment_status || 'Ausstehend'}">${order.payment_status || 'Ausstehend'}</span></td>
-            <td>${order.customer_name}</td>
+            <td>${order.customer_name} ${importBadge}</td>
             <td>${date}</td>
             <td>${order.payment_method}</td>
             <td>${total}</td>
