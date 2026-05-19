@@ -10,8 +10,48 @@
 <body>
     <div class="admin-container">
         <header class="admin-header">
-            <h1>Bestellungen</h1>
+            <h1>Bestellungen - Sternenpfade Admin</h1>
         </header>
+
+        <!-- Premium Dashboard Stats -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(76, 175, 80, 0.1); color: #4CAF50;">📈</div>
+                <div class="stat-info">
+                    <span class="stat-label">Gesamtumsatz</span>
+                    <span class="stat-value" id="statTotalRevenue">€ 0,00</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(33, 150, 243, 0.1); color: #2196F3;">💰</div>
+                <div class="stat-info">
+                    <span class="stat-label">Bezahlt</span>
+                    <span class="stat-value" id="statPaidRevenue">€ 0,00</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(255, 152, 0, 0.1); color: #FF9800;">⏳</div>
+                <div class="stat-info">
+                    <span class="stat-label">Ausstehend</span>
+                    <span class="stat-value" id="statPendingRevenue">€ 0,00</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(156, 39, 176, 0.1); color: #9C27B0;">🛒</div>
+                <div class="stat-info">
+                    <span class="stat-label">Bestellungen</span>
+                    <span class="stat-value" id="statOrderCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Premium Monthly Charts -->
+        <div class="dashboard-months-card">
+            <h3>Umsatz nach Monaten</h3>
+            <div class="dashboard-months" id="dashboardMonths">
+                <div style="text-align: center; color: #777; width: 100%; padding: 20px;">Lade Umsatzdaten...</div>
+            </div>
+        </div>
 
         <div class="admin-toolbar">
             <div class="search-filters">

@@ -113,4 +113,121 @@ document.addEventListener('DOMContentLoaded', () => {
             item.classList.toggle('active');
         });
     });
+
+    // 6. Testimonial Slider
+    const slidesContainer = document.querySelector('.testimonial-slides');
+    if (slidesContainer) {
+        const slidesArray = Array.from(slidesContainer.querySelectorAll('.testimonial-slide'));
+        // Shuffle the array (Fisher-Yates)
+        for (let i = slidesArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [slidesArray[i], slidesArray[j]] = [slidesArray[j], slidesArray[i]];
+        }
+        // Re-append in randomized order
+        slidesArray.forEach(slide => {
+            slide.classList.remove('active');
+            slide.style.display = 'none';
+            slide.style.opacity = '0';
+            slide.style.transform = 'translateY(20px)';
+            slidesContainer.appendChild(slide);
+        });
+        // Make the first shuffled slide active initially
+        if (slidesArray.length > 0) {
+            slidesArray[0].classList.add('active');
+            slidesArray[0].style.display = 'block';
+            slidesArray[0].style.opacity = '1';
+            slidesArray[0].style.transform = 'translateY(0)';
+        }
+    }
+
+    const slides = document.querySelectorAll('.testimonial-slide');
+    const dots = document.querySelectorAll('.slider-dot');
+    const prevArrow = document.querySelector('.prev-arrow');
+    const nextArrow = document.querySelector('.next-arrow');
+    let currentSlide = 0;
+    let slideInterval;
+
+    if (slides.length > 0) {
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.style.display = 'block';
+                    // Force a reflow for transition
+                    slide.offsetHeight; 
+                    slide.style.opacity = '1';
+                    slide.style.transform = 'translateY(0)';
+                } else {
+                    slide.style.opacity = '0';
+                    slide.style.transform = 'translateY(20px)';
+                    // Match the CSS transition duration before hiding
+                    setTimeout(() => {
+                        if (currentSlide !== i) {
+                            slide.style.display = 'none';
+                        }
+                    }, 600);
+                }
+            });
+
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.add('active');
+                    dot.style.background = 'var(--c-gold)';
+                } else {
+                    dot.classList.remove('active');
+                    dot.style.background = 'rgba(255, 255, 255, 0.3)';
+                }
+            });
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            let next = (currentSlide + 1) % slides.length;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            let prev = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prev);
+        }
+
+        function startAutoPlay() {
+            stopAutoPlay();
+            slideInterval = setInterval(nextSlide, 7000); // Rotate every 7 seconds
+        }
+
+        function stopAutoPlay() {
+            if (slideInterval) {
+                clearInterval(slideInterval);
+            }
+        }
+
+        if (prevArrow && nextArrow) {
+            prevArrow.addEventListener('click', () => {
+                prevSlide();
+                startAutoPlay(); // Reset timer
+            });
+            nextArrow.addEventListener('click', () => {
+                nextSlide();
+                startAutoPlay(); // Reset timer
+            });
+        }
+
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                showSlide(i);
+                startAutoPlay(); // Reset timer
+            });
+        });
+
+        // Pause on Hover
+        const container = document.querySelector('.testimonial-slider-container');
+        if (container) {
+            container.addEventListener('mouseenter', stopAutoPlay);
+            container.addEventListener('mouseleave', startAutoPlay);
+        }
+
+        // Initialize
+        showSlide(0);
+        startAutoPlay();
+    }
 });

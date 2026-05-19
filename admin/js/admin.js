@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     fetchOrders();
+    loadDashboard();
 
     document.getElementById('statusFilter').addEventListener('change', fetchOrders);
     document.getElementById('paymentFilter').addEventListener('change', fetchOrders);
@@ -65,5 +66,105 @@ function renderOrders(orders) {
             </td>
         `;
         tbody.appendChild(tr);
+    });
+}
+
+async function loadDashboard() {
+    try {
+        const response = await fetch('/api/admin/orders');
+        if (!response.ok) throw new Error('Failed to fetch dashboard data');
+        const allOrders = await response.json();
+        renderDashboard(allOrders);
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        document.getElementById('dashboardMonths').innerHTML = '<div style="color: red; padding: 20px;">Fehler beim Laden der Umsatzstatistik.</div>';
+    }
+}
+
+function renderDashboard(orders) {
+    let totalRevenue = 0;
+    let paidRevenue = 0;
+    let pendingRevenue = 0;
+    let orderCount = orders.length;
+
+    const monthlyData = {};
+
+    orders.forEach(order => {
+        if (order.status === 'Storniert') return;
+
+        const amount = order.total_amount || 0;
+        totalRevenue += amount;
+
+        if (order.payment_status === 'Bezahlt') {
+            paidRevenue += amount;
+        } else {
+            pendingRevenue += amount;
+        }
+
+        const date = new Date(order.created_at);
+        if (!isNaN(date.getTime())) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const key = `${year}-${month}`;
+
+            if (!monthlyData[key]) {
+                monthlyData[key] = {
+                    total: 0,
+                    paid: 0,
+                    count: 0,
+                    name: date.toLocaleString('de-AT', { month: 'long', year: 'numeric' })
+                };
+            }
+            monthlyData[key].total += amount;
+            if (order.payment_status === 'Bezahlt') {
+                monthlyData[key].paid += amount;
+            }
+            monthlyData[key].count += 1;
+        }
+    });
+
+    document.getElementById('statTotalRevenue').innerText = `€ ${totalRevenue.toFixed(2).replace('.', ',')}`;
+    document.getElementById('statPaidRevenue').innerText = `€ ${paidRevenue.toFixed(2).replace('.', ',')}`;
+    document.getElementById('statPendingRevenue').innerText = `€ ${pendingRevenue.toFixed(2).replace('.', ',')}`;
+    document.getElementById('statOrderCount').innerText = orderCount;
+
+    const monthsContainer = document.getElementById('dashboardMonths');
+    monthsContainer.innerHTML = '';
+
+    const sortedKeys = Object.keys(monthlyData).sort((a, b) => b.localeCompare(a));
+
+    if (sortedKeys.length === 0) {
+        monthsContainer.innerHTML = '<div style="text-align: center; color: #777; width: 100%; padding: 20px;">Keine Umsatzdaten vorhanden.</div>';
+        return;
+    }
+
+    const maxMonthlyRevenue = Math.max(...Object.values(monthlyData).map(m => m.total)) || 1;
+
+    sortedKeys.forEach(key => {
+        const data = monthlyData[key];
+        const percent = Math.min(100, Math.round((data.total / maxMonthlyRevenue) * 100));
+
+        const monthCard = document.createElement('div');
+        monthCard.className = 'month-card';
+        monthCard.innerHTML = `
+            <div class="month-header">
+                <span class="month-name">${data.name}</span>
+                <span class="month-orders-badge">${data.count} ${data.count === 1 ? 'Bestellung' : 'Bestellungen'}</span>
+            </div>
+            <div class="month-totals">
+                <div class="month-total-row">
+                    <span class="month-total-label">Gesamtumsatz:</span>
+                    <span class="month-total-value">€ ${data.total.toFixed(2).replace('.', ',')}</span>
+                </div>
+                <div class="month-total-row">
+                    <span class="month-total-label">Davon bezahlt:</span>
+                    <span class="month-total-value paid-value">€ ${data.paid.toFixed(2).replace('.', ',')}</span>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: ${percent}%;"></div>
+            </div>
+        `;
+        monthsContainer.appendChild(monthCard);
     });
 }

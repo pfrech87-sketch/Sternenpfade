@@ -29,6 +29,31 @@ else:
     print(f"[SYSTEM-CHECK] OK: EMAIL_PASSWORD gefunden (Länge: {len(email_pw)} Zeichen)")
 # ------------------------------
 
+# --- ADMIN BASIC AUTHENTICATION ---
+from functools import wraps
+from flask import Response
+
+def check_auth(username, password):
+    expected_username = os.environ.get('ADMIN_USERNAME', 'info@sternenpfade.at')
+    allowed_usernames = [expected_username, 'info@sternenfpade.at', 'info@sternenpfade.at', 'admin']
+    expected_password = os.environ.get('ADMIN_PASSWORD', 'patrick')
+    return username in allowed_usernames and password == expected_password
+
+def authenticate():
+    return Response(
+        'Zugriff verweigert. Bitte gib den korrekten Benutzernamen und das Passwort ein.', 401,
+        {'WWW-Authenticate': 'Basic realm="Sternenpfade Admin Login"'}
+    )
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
@@ -44,6 +69,19 @@ def serve_css(filename):
 @app.route('/js/<path:filename>')
 def serve_js(filename):
     return send_from_directory(os.path.join(app.static_folder, 'js'), filename)
+
+@app.route('/admin')
+@app.route('/admin/')
+@requires_auth
+def serve_admin_index():
+    admin_dir = os.path.join(app.static_folder, 'admin')
+    return send_from_directory(admin_dir, 'index.html')
+
+@app.route('/admin/<path:filename>')
+@requires_auth
+def serve_admin_pages(filename):
+    admin_dir = os.path.join(app.static_folder, 'admin')
+    return send_from_directory(admin_dir, filename)
 
 @app.route('/<path:filename>')
 def serve_pages(filename):
@@ -181,6 +219,7 @@ def checkout():
 # --- ADMIN ROUTES ---
 
 @app.route('/api/admin/orders', methods=['GET'])
+@requires_auth
 def get_orders():
     # In a real app, verify admin authentication here
     conn = get_db_connection()
@@ -218,6 +257,7 @@ def get_orders():
         conn.close()
 
 @app.route('/api/admin/orders/<int:order_id>', methods=['GET'])
+@requires_auth
 def get_order(order_id):
     conn = get_db_connection()
     try:
@@ -235,6 +275,7 @@ def get_order(order_id):
         conn.close()
 
 @app.route('/api/admin/orders/<int:order_id>/status', methods=['PUT'])
+@requires_auth
 def update_order_status(order_id):
     data = request.json
     new_status = data.get('status')
@@ -275,6 +316,7 @@ def update_order_status(order_id):
         conn.close()
 
 @app.route('/api/admin/orders/<int:order_id>/invoice', methods=['GET'])
+@requires_auth
 def get_order_invoice(order_id):
     conn = get_db_connection()
     try:

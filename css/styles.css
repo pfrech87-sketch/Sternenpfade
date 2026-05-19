@@ -585,3 +585,30 @@ footer {
   overflow: hidden;
   min-height: 700px;
 }
+
+/* Testimonial Slider Styling */
+.testimonial-slider-container {
+  height: 380px !important;
+}
+
+.testimonial-slider-container .slider-arrow:hover {
+  background: var(--c-gold) !important;
+  color: var(--c-bg-dark) !important;
+  border-color: var(--c-gold) !important;
+  transform: translateY(-50%) scale(1.08) !important;
+}
+
+.testimonial-slider-container .slider-dot:hover {
+  background: var(--c-white) !important;
+}
+
+@media (max-width: 768px) {
+  .testimonial-slider-container .slider-arrow {
+    display: none !important;
+  }
+  .testimonial-slider-container {
+    padding: 2.5rem 1.25rem !important;
+    height: auto !important;
+    min-height: 480px !important;
+  }
+}
