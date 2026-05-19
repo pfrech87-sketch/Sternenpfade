@@ -160,3 +160,57 @@ def send_digital_delivery(order_dict):
 
     msg = _create_message(customer_email, f"Deine Downloads - Sternenpfade (Bestellung {order_dict.get('order_number')})", body_parts)
     return _send_via_smtp(msg)
+
+def send_contact_form(contact_dict):
+    """Versendet eine E-Mail für das Kontaktformular an info@sternenpfade.at und eine Bestätigung an den Absender."""
+    name = str(contact_dict.get('name', '')).strip()
+    email = str(contact_dict.get('email', '')).strip()
+    phone = str(contact_dict.get('phone', '')).strip()
+    message = str(contact_dict.get('message', '')).strip()
+    
+    # 1. E-Mail an dich selbst (Patrick)
+    admin_subject = f"Neue Kontaktanfrage über Sternenpfade Website von {name}"
+    admin_body = [
+        "Hallo Patrick,", "",
+        "eine neue Kontaktanfrage wurde über deine Website eingereicht.", "",
+        "✨ DETAILS:",
+        f"- Name: {name}",
+        f"- E-Mail: {email}",
+        f"- Telefonnummer: {phone if phone else 'Nicht angegeben'}",
+        "",
+        "💬 NACHRICHT:",
+        message,
+        "",
+        "---",
+        "Diese E-Mail wurde automatisch von deinem Sternenpfade-Backend generiert."
+    ]
+    
+    admin_msg = _create_message(SMTP_USER, admin_subject, admin_body)
+    admin_msg['Reply-To'] = email
+    
+    success = _send_via_smtp(admin_msg)
+    
+    # 2. Bestätigung an den Absender (Customer)
+    if success and email:
+        try:
+            customer_subject = "Deine Kontaktanfrage bei Sternenpfade"
+            customer_body = [
+                f"Hallo {name},", "",
+                "vielen lieben Dank für deine Nachricht und deine Anfrage bei Sternenpfade! 🤍💙✨", "",
+                "Ich habe deine Nachricht erhalten und werde mich in Kürze bei dir melden.", "",
+                "💬 DEINE NACHRICHT:",
+                message,
+                "",
+                "Von Herzen danke für dein Vertrauen.",
+                "",
+                "Herzensgruß",
+                "Patrick",
+                "✨ www.sternenpfade.at"
+            ]
+            customer_msg = _create_message(email, customer_subject, customer_body)
+            _send_via_smtp(customer_msg)
+        except Exception as e:
+            print(f"Fehler beim Senden der Bestätigung an den Kunden: {e}")
+            
+    return success
+

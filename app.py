@@ -216,7 +216,31 @@ def checkout():
     finally:
         conn.close()
 
+@app.route('/api/contact', methods=['POST'])
+def contact():
+    data = request.json
+    if not data:
+        return jsonify({'error': 'Keine Daten übermittelt.'}), 400
+
+    # Basic Validation
+    required_fields = ['name', 'email', 'message']
+    for field in required_fields:
+        if field not in data or not str(data[field]).strip():
+            return jsonify({'error': f'Bitte fülle das Feld "{field}" aus.'}), 400
+
+    from email_service import send_contact_form
+    try:
+        success = send_contact_form(data)
+        if success:
+            return jsonify({'success': True, 'message': 'Vielen Dank! Deine Nachricht wurde erfolgreich gesendet.'}), 200
+        else:
+            return jsonify({'error': 'Fehler beim Senden der E-Mail. Bitte kontaktiere uns direkt via info@sternenpfade.at.'}), 500
+    except Exception as e:
+        print(f"Error in contact API: {e}")
+        return jsonify({'error': f'Serverfehler beim Verarbeiten der Anfrage: {str(e)}'}), 500
+
 # --- ADMIN ROUTES ---
+
 
 @app.route('/api/admin/orders', methods=['GET'])
 @requires_auth

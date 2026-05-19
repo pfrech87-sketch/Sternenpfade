@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formResult.innerHTML = "Nachricht wird gesendet...";
             formResult.style.color = "var(--c-white)";
             
-            fetch('https://api.web3forms.com/submit', {
+            fetch('/api/contact', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(async (response) => {
                 let json = await response.json();
-                if (response.status == 200) {
-                    formResult.innerHTML = "Vielen Dank! Deine Nachricht wurde erfolgreich gesendet.";
+                if (response.status == 200 || response.status == 201) {
+                    formResult.innerHTML = json.message || "Vielen Dank! Deine Nachricht wurde erfolgreich gesendet.";
                     formResult.style.background = "linear-gradient(135deg, var(--c-teal), var(--c-violet))";
                     formResult.style.color = "var(--c-white)";
                     formResult.style.padding = "12px 20px";
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     formResult.style.display = "block";
                 } else {
                     console.log(response);
-                    formResult.innerHTML = json.message || "Etwas ist schief gelaufen.";
+                    formResult.innerHTML = json.error || json.message || "Etwas ist schief gelaufen.";
                     formResult.style.color = "var(--c-pink)";
                 }
             })

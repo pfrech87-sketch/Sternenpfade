@@ -110,7 +110,7 @@
 
             <div class="hero-buttons">
                 <a href="#entdecke" class="btn btn-primary">Pfade entdecken</a>
-                <a href="booking.html" class="btn btn-secondary">Termin finden</a>
+                <a href="booking.html#live-termin" class="btn btn-secondary">Termin finden</a>
             </div>
         </div>
     </section>
@@ -352,7 +352,7 @@
                 <h3 style="color: var(--c-white); margin-bottom: 1.5rem;">Digitale Welt & Dienstleistungen buchen</h3>
                 <p>Tierkommunikation ist mein Hauptangebot und Herzensweg. Entdecke hier die digitale Welt von Sternenpfade, buche deine individuellen Sitzungen direkt online oder stöbere in meinen Kursen zur eigenen Weiterentwicklung.</p>
                 <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-                    <a href="booking.html" class="btn btn-primary">Termin buchen</a>
+                    <a href="booking.html#live-termin" class="btn btn-primary">Termin buchen</a>
                     <a href="booking.html" class="btn btn-secondary">Zur Übersicht</a>
                 </div>
             </div>
@@ -384,11 +384,7 @@
             <div class="glass-card" style="border-color: rgba(1,99,149,0.3);">
                 <h3 style="color: var(--c-white); margin-bottom: 1.5rem;">Kontaktanfrage per E-Mail</h3>
                 <p style="margin-bottom: 1rem; font-size: 0.9rem;">Sende eine E-Mail an <a href="mailto:info@sternenpfade.at" style="color: var(--c-teal); text-decoration: underline;">info@sternenpfade.at</a> oder nutze das Formular:</p>
-                <form id="contactForm" action="https://api.web3forms.com/submit" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
-                    <!-- Web3Forms Configuration -->
-                    <input type="hidden" name="access_key" value="3d95ba58-5b60-48b8-9897-806e199817fa">
-                    <input type="hidden" name="subject" value="Neue Kontaktanfrage über Sternenpfade Website">
-                    <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+                <form id="contactForm" action="/api/contact" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
                     <div>
                         <label for="name" style="display: block; margin-bottom: 0.5rem; color: var(--c-white); font-size: 0.9rem;">Dein Name</label>
                         <input type="text" id="name" name="name" required style="width: 100%; padding: 0.8rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: var(--c-white); font-family: inherit;">
