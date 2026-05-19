@@ -6,10 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('paymentFilter').addEventListener('change', fetchOrders);
     document.getElementById('searchInput').addEventListener('input', fetchOrders);
 
-    const repairBtn = document.getElementById('repairDbBtn');
-    if (repairBtn) {
-        repairBtn.addEventListener('click', handleRepairDatabase);
-    }
 });
 
 async function fetchOrders() {
@@ -178,45 +174,3 @@ function renderDashboard(orders) {
     });
 }
 
-async function handleRepairDatabase() {
-    const confirmed = confirm("Möchtest du den Nummernkreis und die historischen IDs korrigieren?\n\nDies löscht die fehlerhafte Buchung #194 (sofern vorhanden), ordnet die importierten Bestellungen mit ihren Originalnummern (90-138) ein und stellt sicher, dass die nächste neue Buchung mit Nummer 145 fortgesetzt wird.");
-    if (!confirmed) return;
-
-    const repairBtn = document.getElementById('repairDbBtn');
-    if (repairBtn) {
-        repairBtn.disabled = true;
-        repairBtn.innerText = "Verarbeite...";
-        repairBtn.style.opacity = "0.5";
-    }
-
-    try {
-        const response = await fetch('/api/admin/fix-db', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            alert("Erfolg!\n\n" + data.logs.join("\n"));
-            location.reload();
-        } else {
-            alert("Fehler bei der Reparatur:\n\n" + (data.error || "Unbekannter Fehler") + "\n\nLogs:\n" + (data.logs ? data.logs.join("\n") : "Keine"));
-            if (repairBtn) {
-                repairBtn.disabled = false;
-                repairBtn.innerText = "Nummernkreis korrigieren";
-                repairBtn.style.opacity = "1";
-            }
-        }
-    } catch (error) {
-        console.error("Error repairing database:", error);
-        alert("Netzwerkfehler bei der Verbindung zum Server: " + error.message);
-        if (repairBtn) {
-            repairBtn.disabled = false;
-            repairBtn.innerText = "Nummernkreis korrigieren";
-            repairBtn.style.opacity = "1";
-        }
-    }
-}
