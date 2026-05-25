@@ -21,6 +21,15 @@ DIGITAL_PRODUCTS = {
     "Zurueck in deine Mitte": "https://www.sternenpfade.at/downloads/zurueck-in-deine-mitte.mp3"
 }
 
+DIGITAL_PRODUCT_FILES = {
+    "Gratis Download: Herzens-Verständnis": "Impulse zur Tierkommunikation.pdf",
+    "Gratis Download Herzens-Verstaendnis": "Impulse zur Tierkommunikation.pdf",
+    "Friedensreise mit Anubis": "anubis-meditation.mp3",
+    "Heilreise mit Anubis": "anubis-meditation.mp3",
+    "Zurueck in deine Mitte": "zurueck-in-deine-mitte.mp3"
+}
+
+
 def _create_message(to_email, subject, body_parts):
     """Hilfsfunktion zum Erstellen einer Multipart-E-Mail (HTML & Text)"""
     text_content = "\n".join(body_parts)
@@ -104,17 +113,31 @@ def send_order_confirmation(order_dict, pdf_path):
 
     msg = _create_message(customer_email, subject, body_parts)
 
-    # Rechnung anhängen
-    if pdf_path and os.path.exists(pdf_path):
+    # Anhänge definieren
+    attachments = []
+    if is_free_order:
+        downloads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
+        for item in items:
+            name = item.get('name', item.get('item_name', ''))
+            if name in DIGITAL_PRODUCT_FILES:
+                file_path = os.path.join(downloads_dir, DIGITAL_PRODUCT_FILES[name])
+                if os.path.exists(file_path):
+                    attachments.append(file_path)
+    else:
+        if pdf_path and os.path.exists(pdf_path):
+            attachments.append(pdf_path)
+
+    # Anhänge an die E-Mail anfügen
+    for path in attachments:
         try:
-            with open(pdf_path, "rb") as f:
+            with open(path, "rb") as f:
                 part = MIMEBase("application", "octet-stream")
                 part.set_payload(f.read())
                 encoders.encode_base64(part)
-                part.add_header("Content-Disposition", f"attachment; filename={os.path.basename(pdf_path)}")
+                part.add_header("Content-Disposition", f"attachment; filename={os.path.basename(path)}")
                 msg.attach(part)
         except Exception as e:
-            print(f"Anhang-Fehler: {e}")
+            print(f"Anhang-Fehler für {path}: {e}")
 
     # Senden
     success = _send_via_smtp(msg)
