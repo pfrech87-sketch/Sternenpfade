@@ -172,7 +172,7 @@
                         <span style="font-weight: 500; font-size: 0.95rem;">Anzahl</span>
                         <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px;">
                             <button id="btnDecrease" type="button" style="background: none; border: none; color: var(--c-white); font-size: 1.2rem; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; border-radius: 4px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">-</button>
-                            <input id="quantityInput" type="number" min="1" max="10" value="1" readonly style="width: 30px; text-align: center; border: none; background: none; color: var(--c-white); font-size: 1rem; font-weight: 600; padding: 0; margin: 0; outline: none; -moz-appearance: textfield; -webkit-appearance: none;">
+                            <input id="quantityInput" type="number" min="1" max="4" value="1" readonly style="width: 30px; text-align: center; border: none; background: none; color: var(--c-white); font-size: 1rem; font-weight: 600; padding: 0; margin: 0; outline: none; -moz-appearance: textfield; -webkit-appearance: none;">
                             <button id="btnIncrease" type="button" style="background: none; border: none; color: var(--c-white); font-size: 1.2rem; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; border-radius: 4px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">+</button>
                         </div>
                     </div>
@@ -274,7 +274,7 @@
                     });
 
                     btnIncrease.addEventListener('click', () => {
-                        if (quantity < 10) {
+                        if (quantity < 4) {
                             quantity++;
                             updateSummary();
                         }
