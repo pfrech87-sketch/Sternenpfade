@@ -86,6 +86,11 @@
                 padding: 6rem 1rem 3rem;
             }
         }
+        #quantityInput::-webkit-outer-spin-button,
+        #quantityInput::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 
     <!-- Open Graph Tags für Social Media & KI Previews -->
@@ -163,6 +168,14 @@
                         </div>
                         <span id="itemPriceDisplay" style="color: var(--c-gold); font-weight: 600;">€ 0,00</span>
                     </div>
+                    <div id="quantityContainer" class="summary-item" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-weight: 500; font-size: 0.95rem;">Anzahl</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px;">
+                            <button id="btnDecrease" type="button" style="background: none; border: none; color: var(--c-white); font-size: 1.2rem; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; border-radius: 4px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">-</button>
+                            <input id="quantityInput" type="number" min="1" max="10" value="1" readonly style="width: 30px; text-align: center; border: none; background: none; color: var(--c-white); font-size: 1rem; font-weight: 600; padding: 0; margin: 0; outline: none; -moz-appearance: textfield; -webkit-appearance: none;">
+                            <button id="btnIncrease" type="button" style="background: none; border: none; color: var(--c-white); font-size: 1.2rem; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; border-radius: 4px;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">+</button>
+                        </div>
+                    </div>
                     <div class="summary-total">
                         <span>Gesamt</span>
                         <span id="totalPriceDisplay">€ 0,00</span>
@@ -237,14 +250,49 @@
                 itemImage.style.display = 'block';
             }
 
-            document.getElementById('itemNameDisplay').textContent = itemName;
-            document.getElementById('itemPriceDisplay').textContent = itemPrice === 0 ? 'Gratis' : `€ ${itemPrice.toFixed(2).replace('.', ',')}`;
-            document.getElementById('totalPriceDisplay').textContent = itemPrice === 0 ? 'Gratis' : `€ ${itemPrice.toFixed(2).replace('.', ',')}`;
+            let quantity = 1;
+            const quantityContainer = document.getElementById('quantityContainer');
+            const quantityInput = document.getElementById('quantityInput');
+            const btnDecrease = document.getElementById('btnDecrease');
+            const btnIncrease = document.getElementById('btnIncrease');
+            const totalPriceDisplay = document.getElementById('totalPriceDisplay');
 
             if (itemPrice === 0) {
                 document.getElementById('submitBtn').textContent = 'Jetzt gratis sichern';
                 document.querySelector('.payment-info').style.display = 'none';
+                if (quantityContainer) {
+                    quantityContainer.style.display = 'none';
+                }
+            } else {
+                // Quantity button listeners
+                if (btnDecrease && btnIncrease && quantityInput) {
+                    btnDecrease.addEventListener('click', () => {
+                        if (quantity > 1) {
+                            quantity--;
+                            updateSummary();
+                        }
+                    });
+
+                    btnIncrease.addEventListener('click', () => {
+                        if (quantity < 10) {
+                            quantity++;
+                            updateSummary();
+                        }
+                    });
+                }
             }
+
+            function updateSummary() {
+                if (quantityInput) quantityInput.value = quantity;
+                const total = itemPrice * quantity;
+                if (totalPriceDisplay) {
+                    totalPriceDisplay.textContent = `€ ${total.toFixed(2).replace('.', ',')}`;
+                }
+            }
+
+            document.getElementById('itemNameDisplay').textContent = itemName;
+            document.getElementById('itemPriceDisplay').textContent = itemPrice === 0 ? 'Gratis' : `€ ${itemPrice.toFixed(2).replace('.', ',')}`;
+            updateSummary();
 
             document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -260,7 +308,7 @@
                     billing_address: document.getElementById('address').value,
                     notes: document.getElementById('notes').value,
                     items: [
-                        { name: itemName, quantity: 1, price: itemPrice }
+                        { name: itemName, quantity: quantity, price: itemPrice }
                     ]
                 };
 
@@ -282,12 +330,12 @@
                         if (typeof gtag === 'function') {
                             gtag('event', 'purchase', {
                                 transaction_id: result.order_number,
-                                value: itemPrice,
+                                value: itemPrice * quantity,
                                 currency: 'EUR',
                                 items: [{
                                     item_name: itemName,
                                     price: itemPrice,
-                                    quantity: 1
+                                    quantity: quantity
                                 }]
                             });
                         }
