@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manuelle Bestellung anlegen - Sternenpfade Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+        }
+        .form-group-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .form-group-col label {
+            font-weight: 500;
+            color: #555;
+            font-size: 14px;
+        }
+        .form-group-col input, .form-group-col textarea, .form-group-col select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .form-group-col input:focus, .form-group-col textarea:focus, .form-group-col select:focus {
+            outline: none;
+            border-color: #7cb342;
+        }
+        .items-builder-box {
+            background: #fdfdfc;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .builder-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .order-items-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .order-items-list-table th, .order-items-list-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .order-items-list-table th {
+            background: #f5f5f3;
+            font-weight: 600;
+        }
+        .total-box {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-top: 15px;
+            text-align: right;
+            padding-top: 10px;
+            border-top: 2px solid #ddd;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .checkbox-container input {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Neue Bestellung manuell anlegen</h1>
+            <a href="index.html" class="back-link btn btn-default">&larr; Zurück</a>
+        </header>
+
+        <form id="newOrderForm">
+            <div class="form-grid">
+                <!-- Kunde & Rechnungsdetails -->
+                <div class="card">
+                    <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px; color:#333;">Kundeninformationen</h3>
+                    
+                    <div class="form-group-col">
+                        <label for="customerName">Vor- und Nachname *</label>
+                        <input type="text" id="customerName" placeholder="z.B. Johann Becker" required>
+                    </div>
+
+                    <div class="form-group-col">
+                        <label for="customerEmail">E-Mail Adresse *</label>
+                        <input type="email" id="customerEmail" placeholder="z.B. kunde@beispiel.de" required>
+                    </div>
+
+                    <div class="form-group-col">
+                        <label for="customerPhone">Telefonnummer (Optional)</label>
+                        <input type="tel" id="customerPhone" placeholder="z.B. +49 170 1234567">
+                    </div>
+
+                    <div class="form-group-col">
+                        <label for="billingAddress">Rechnungsadresse *</label>
+                        <textarea id="billingAddress" rows="4" placeholder="Straße Hausnr.&#10;PLZ Ort&#10;Land" required></textarea>
+                    </div>
+
+                    <div class="form-group-col">
+                        <label for="orderNotes">Anmerkungen (Optional)</label>
+                        <textarea id="orderNotes" rows="2" placeholder="z.B. Über Calendly gebucht / Abstimmung erfolgt"></textarea>
+                    </div>
+                </div>
+
+                <!-- Bestellstatus, Produkte & Beträge -->
+                <div>
+                    <div class="card">
+                        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px; color:#333;">Einstellungen & Status</h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group-col">
+                                <label for="orderStatus">Bearbeitungsstatus</label>
+                                <select id="orderStatus">
+                                    <option value="Offen">Offen</option>
+                                    <option value="Erledigt" selected>Erledigt</option>
+                                    <option value="Importiert">Importiert</option>
+                                </select>
+                            </div>
+                            <div class="form-group-col">
+                                <label for="paymentStatus">Zahlungsstatus</label>
+                                <select id="paymentStatus">
+                                    <option value="Ausstehend">Ausstehend</option>
+                                    <option value="Bezahlt" selected>Bezahlt</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group-col" style="margin-top: 5px;">
+                            <label for="paymentMethod">Zahlungsmethode</label>
+                            <select id="paymentMethod">
+                                <option value="Überweisung, Vorkasse">Überweisung, Vorkasse</option>
+                                <option value="Calendly / Stripe">Calendly / Stripe</option>
+                                <option value="Calendly / PayPal">Calendly / PayPal</option>
+                                <option value="Barzahlung">Barzahlung</option>
+                                <option value="Kostenlos">Kostenlos (0 €)</option>
+                                <option value="Sonstige">Sonstige</option>
+                            </select>
+                        </div>
+
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="sendEmail" checked>
+                            <span><strong>Rechnung direkt per E-Mail senden</strong> (PDF-Rechnung wird automatisch generiert und an den Kunden geschickt)</span>
+                        </label>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px; color:#333;">Bestellte Produkte / Dienstleistungen</h3>
+                        
+                        <div class="items-builder-box">
+                            <h4 style="margin-top:0; margin-bottom:10px; font-size:14px; color:#555;">Produkt hinzufügen</h4>
+                            <div class="builder-row">
+                                <div class="form-group-col" style="margin-bottom:0;">
+                                    <label for="productSelect">Produkt-Auswahl</label>
+                                    <select id="productSelect">
+                                        <option value="" disabled selected>-- Produkt wählen --</option>
+                                        <option value="Schamanische Tierkommunikation" data-price="90">Schamanische Tierkommunikation (90 €)</option>
+                                        <option value="Jenseitskontakt fuer Tiere" data-price="90">Jenseitskontakt für Tiere (90 €)</option>
+                                        <option value="Seelenfeld Kompass Duo-Coaching" data-price="150">Seelenfeld Kompass: Duo-Coaching (150 €)</option>
+                                        <option value="Kraftsegen fuer Tiere" data-price="40">Kraftsegen für Tiere (40 €)</option>
+                                        <option value="Soul Link" data-price="120">Soul Link (120 €)</option>
+                                        <option value="Sternenpfade Lebensbegleitung" data-price="150">Sternenpfade Lebensbegleitung (150 €)</option>
+                                        <option value="Schamanische Sitzung (Online)" data-price="120">Schamanische Sitzung (Online - 120 €)</option>
+                                        <option value="Schamanische Sitzung (Praesenz)" data-price="150">Schamanische Sitzung (Präsenz - 150 €)</option>
+                                        <option value="Schamanische Fernbehandlung" data-price="120">Schamanische Fernbehandlung (120 €)</option>
+                                        <option value="Sternenlicht-Begleitung" data-price="90">Sternenlicht-Begleitung (Babys/Kinder) (90 €)</option>
+                                        <option value="Schamanisches Sternzeichen Orakel" data-price="120">Schamanisches Sternzeichen Orakel (120 €)</option>
+                                        <option value="Der Pfad zur Tierkommunikation" data-price="190">Der Pfad zur Tierkommunikation (Kurs - 190 €)</option>
+                                        <option value="Friedensreise mit Anubis" data-price="25">Friedensreise mit Anubis (Meditation - 25 €)</option>
+                                        <option value="Zurueck in deine Mitte" data-price="25">Zurück in deine Mitte (25 €)</option>
+                                        <option value="Gratis Download Herzens-Verstaendnis" data-price="0">Gratis Download: Herzens-Verständnis (0 €)</option>
+                                        <option value="custom">-- Freier Betrag / Custom --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-col" style="margin-bottom:0;">
+                                    <label for="itemPrice">Einzelpreis (€)</label>
+                                    <input type="number" id="itemPrice" min="0" step="0.01" value="0.00">
+                                </div>
+                                <div class="form-group-col" style="margin-bottom:0;">
+                                    <label for="itemQty">Menge</label>
+                                    <input type="number" id="itemQty" min="1" max="100" value="1">
+                                </div>
+                                <button type="button" id="addItemBtn" class="btn btn-default" style="padding: 10px 15px; border-color:#ccc; font-weight:600;">Hinzufügen</button>
+                            </div>
+
+                            <div class="form-group-col" id="customProductRow" style="display:none; margin-top:10px;">
+                                <label for="customProductName">Benutzerdefinierter Produktname</label>
+                                <input type="text" id="customProductName" placeholder="z.B. Individuelle Begleitung & Ritual">
+                            </div>
+                        </div>
+
+                        <!-- Ausgewählte Artikel Liste -->
+                        <h4 style="margin-top:15px; margin-bottom:5px; font-size:14px; color:#555;">Ausgewählte Produkte</h4>
+                        <table class="order-items-list-table">
+                            <thead>
+                                <tr>
+                                    <th>Produkt</th>
+                                    <th>Einzelpreis</th>
+                                    <th>Menge</th>
+                                    <th>Gesamt</th>
+                                    <th style="width: 50px;">Aktion</th>
+                                </tr>
+                            </thead>
+                            <tbody id="selectedItemsBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #888; font-style: italic;">Noch keine Produkte hinzugefügt.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="total-box">
+                            Gesamtbetrag: <span id="orderTotalDisplay" style="color: #7cb342;">€ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formular Aktionen -->
+            <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px;">
+                <a href="index.html" class="btn btn-default">Abbrechen</a>
+                <button type="submit" class="btn btn-green btn-green-dark" style="font-size: 16px; padding: 12px 30px;" id="saveOrderBtn">Kostenpflichtige Bestellung buchen & Rechnung erstellen</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productSelect = document.getElementById('productSelect');
+            const itemPriceInput = document.getElementById('itemPrice');
+            const itemQtyInput = document.getElementById('itemQty');
+            const customProductRow = document.getElementById('customProductRow');
+            const customProductNameInput = document.getElementById('customProductName');
+            const addItemBtn = document.getElementById('addItemBtn');
+            const selectedItemsBody = document.getElementById('selectedItemsBody');
+            const orderTotalDisplay = document.getElementById('orderTotalDisplay');
+            const newOrderForm = document.getElementById('newOrderForm');
+            const saveOrderBtn = document.getElementById('saveOrderBtn');
+
+            let selectedItems = [];
+
+            // Pre-fill fields when selecting standard product
+            productSelect.addEventListener('change', () => {
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                if (selectedOption.value === 'custom') {
+                    customProductRow.style.display = 'block';
+                    customProductNameInput.required = true;
+                    customProductNameInput.value = '';
+                    itemPriceInput.value = '0.00';
+                } else {
+                    customProductRow.style.display = 'none';
+                    customProductNameInput.required = false;
+                    const price = selectedOption.getAttribute('data-price');
+                    itemPriceInput.value = parseFloat(price).toFixed(2);
+                }
+            });
+
+            // Add item to active list
+            addItemBtn.addEventListener('click', () => {
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                if (!productSelect.value) {
+                    alert('Bitte wähle zuerst ein Produkt aus.');
+                    return;
+                }
+
+                let name = selectedOption.value;
+                if (name === 'custom') {
+                    name = customProductNameInput.value.trim();
+                    if (!name) {
+                        alert('Bitte gib einen Produktnamen ein.');
+                        return;
+                    }
+                }
+
+                const price = parseFloat(itemPriceInput.value);
+                const quantity = parseInt(itemQtyInput.value);
+
+                if (isNaN(price) || price < 0) {
+                    alert('Bitte gib einen gültigen Einzelpreis ein.');
+                    return;
+                }
+                if (isNaN(quantity) || quantity < 1) {
+                    alert('Bitte gib eine gültige Menge ein.');
+                    return;
+                }
+
+                // Check if item already in selectedItems list to increment quantity instead
+                const existingItem = selectedItems.find(item => item.name === name && item.price === price);
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    selectedItems.push({ name, price, quantity });
+                }
+
+                // Reset selectors
+                productSelect.selectedIndex = 0;
+                itemPriceInput.value = '0.00';
+                itemQtyInput.value = '1';
+                customProductRow.style.display = 'none';
+                customProductNameInput.value = '';
+
+                renderSelectedItems();
+            });
+
+            // Render active items table
+            function renderSelectedItems() {
+                selectedItemsBody.innerHTML = '';
+                if (selectedItems.length === 0) {
+                    selectedItemsBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888; font-style: italic;">Noch keine Produkte hinzugefügt.</td></tr>';
+                    orderTotalDisplay.innerText = '€ 0,00';
+                    return;
+                }
+
+                let grandTotal = 0;
+                selectedItems.forEach((item, index) => {
+                    const total = item.price * item.quantity;
+                    grandTotal += total;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="bold">${item.name}</td>
+                        <td>€ ${item.price.toFixed(2).replace('.', ',')}</td>
+                        <td>${item.quantity}</td>
+                        <td class="bold">€ ${total.toFixed(2).replace('.', ',')}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-red" onclick="removeOrderItem(${index})">Löschen</button>
+                        </td>
+                    `;
+                    selectedItemsBody.appendChild(tr);
+                });
+
+                orderTotalDisplay.innerText = `€ ${grandTotal.toFixed(2).replace('.', ',')}`;
+            }
+
+            // Expose remove function globally
+            window.removeOrderItem = function(index) {
+                selectedItems.splice(index, 1);
+                renderSelectedItems();
+            };
+
+            // Form Submit handler
+            newOrderForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                if (selectedItems.length === 0) {
+                    alert('Bitte füge mindestens ein Produkt zur Bestellung hinzu.');
+                    return;
+                }
+
+                saveOrderBtn.disabled = true;
+                saveOrderBtn.innerText = 'Bestellung wird angelegt...';
+
+                const orderData = {
+                    customer_name: document.getElementById('customerName').value.trim(),
+                    customer_email: document.getElementById('customerEmail').value.trim(),
+                    customer_phone: document.getElementById('customerPhone').value.trim(),
+                    billing_address: document.getElementById('billingAddress').value.trim(),
+                    notes: document.getElementById('orderNotes').value.trim(),
+                    status: document.getElementById('orderStatus').value,
+                    payment_status: document.getElementById('paymentStatus').value,
+                    payment_method: document.getElementById('paymentMethod').value,
+                    send_email: document.getElementById('sendEmail').checked,
+                    items: selectedItems
+                };
+
+                try {
+                    const response = await fetch('/api/admin/orders', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        let alertMsg = `Manuelle Bestellung Nr. ${result.order_number} wurde erfolgreich angelegt!`;
+                        if (orderData.send_email) {
+                            alertMsg += result.email_sent ? '\nRechnungs-E-Mail wurde erfolgreich an den Kunden verschickt.' : '\nWarnung: Rechnungs-E-Mail konnte nicht verschickt werden (Verbindung prüfen).';
+                        }
+                        alert(alertMsg);
+                        window.location.href = 'index.html';
+                    } else {
+                        throw new Error(result.error || 'Fehler beim Anlegen der Bestellung.');
+                    }
+                } catch (error) {
+                    alert('Fehler: ' + error.message);
+                    saveOrderBtn.disabled = false;
+                    saveOrderBtn.innerText = 'Kostenpflichtige Bestellung buchen & Rechnung erstellen';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

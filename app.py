@@ -216,6 +216,95 @@ def checkout():
     finally:
         conn.close()
 
+@app.route('/api/admin/orders', methods=['POST'])
+@requires_auth
+def admin_create_order():
+    data = request.json
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    required_fields = ['customer_name', 'customer_email', 'billing_address', 'items']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing field: {field}'}), 400
+
+    items = data.get('items', [])
+    if not items:
+        return jsonify({'error': 'Order must contain at least one item'}), 400
+
+    total_amount = sum(item.get('price', 0) * item.get('quantity', 1) for item in items)
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute('''
+            INSERT INTO orders (
+                order_number, customer_name, customer_email, customer_phone,
+                billing_address, shipping_address, notes, total_amount, payment_method, status, payment_status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            'TEMP', # Placeholder
+            data['customer_name'],
+            data['customer_email'],
+            data.get('customer_phone', ''),
+            data['billing_address'],
+            data.get('shipping_address', ''),
+            data.get('notes', ''),
+            total_amount,
+            data.get('payment_method', 'Überweisung, Vorkasse'),
+            data.get('status', 'Offen'),
+            data.get('payment_status', 'Ausstehend')
+        ))
+        
+        order_id = cursor.lastrowid
+        order_number = str(order_id)
+        cursor.execute('UPDATE orders SET order_number = ? WHERE id = ?', (order_number, order_id))
+        
+        for item in items:
+            cursor.execute('''
+                INSERT INTO order_items (order_id, item_name, quantity, price)
+                VALUES (?, ?, ?, ?)
+            ''', (order_id, item['name'], item.get('quantity', 1), item['price']))
+            
+        conn.commit()
+        
+        # Fetch newly created order
+        cursor.execute('SELECT * FROM orders WHERE id = ?', (order_id,))
+        order_row = cursor.fetchone()
+        
+        order_dict = dict(order_row)
+        order_dict['items'] = items
+        order_dict['created_at'] = order_dict['created_at']
+        
+        # Generate Invoice
+        pdf_path = generate_invoice(order_dict)
+        
+        # Send Email if requested
+        email_sent = False
+        if data.get('send_email', True):
+            print(f"[Admin] Attempting to send confirmation email for manual order {order_number} to {order_dict.get('customer_email')}...")
+            email_sent = send_order_confirmation(order_dict, pdf_path)
+            print(f"[Admin] Email sending result: {email_sent}")
+        else:
+            print(f"[Admin] Skipping email confirmation for manual order {order_number} (requested by admin).")
+            
+        return jsonify({
+            'success': True,
+            'message': 'Bestellung erfolgreich manuell angelegt!',
+            'order_id': order_id,
+            'order_number': order_number,
+            'email_sent': email_sent
+        }), 201
+        
+    except Exception as e:
+        conn.rollback()
+        error_msg = str(e)
+        print(f"Error in admin_create_order: {error_msg}")
+        return jsonify({'error': f'Fehler bei der manuellen Bestellung: {error_msg}'}), 500
+    finally:
+        conn.close()
+
 @app.route('/api/contact', methods=['POST'])
 def contact():
     data = request.json
