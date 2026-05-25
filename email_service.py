@@ -69,28 +69,16 @@ def send_order_confirmation(order_dict, pdf_path):
     if not customer_email: return False
 
     items = order_dict.get('items', [])
-    download_links = []
     is_free_order = order_dict.get('total_amount', 0) == 0
-    
-    for item in items:
-        name = item.get('name', item.get('item_name', ''))
-        if name in DIGITAL_PRODUCTS and is_free_order:
-            download_links.append((name, DIGITAL_PRODUCTS[name]))
 
     subject = f"Bestellbestätigung - Sternenpfade (Nr. {order_dict.get('order_number')})"
 
     body_parts = [
         f"Hallo {customer_name},", "",
         "vielen lieben Dank für deine Bestellung bei Sternenpfade 🤍💙✨",
-        "dein Download ist nun bereit." if is_free_order else f"deine Bestellung Nr. {order_dict.get('order_number')} ist eingegangen.",
+        "dein Download ist nun bereit (als Anhang an dieser E-Mail)." if is_free_order else f"deine Bestellung Nr. {order_dict.get('order_number')} ist eingegangen.",
         ""
     ]
-
-    if download_links:
-        body_parts.append("✨ DEINE DOWNLOADS:")
-        for name, link in download_links:
-            body_parts.append(f"- {name}: {link}")
-        body_parts.append("")
 
     if not is_free_order:
         body_parts.extend([
