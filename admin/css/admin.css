@@ -81,7 +81,7 @@ body {
 .status-Bezahlt { background-color: #5cb85c; } /* Grün */
 .status-Importiert { background-color: #5cb85c; } /* Grün (für historische Bestellungen) */
 .status-Ausstehend { background-color: #d9534f; } /* Rot */
-.status-Storniert { background-color: #d9534f; }
+.status-Storniert { background-color: #5cb85c; }
 
 .btn {
     padding: 8px 16px;
