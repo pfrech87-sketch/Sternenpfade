@@ -296,7 +296,7 @@
             // Autocomplete customer data on select/input
             customerNameInput.addEventListener('input', () => {
                 const selectedName = customerNameInput.value.trim().toLowerCase();
-                const matched = allCustomers.find(c => c.name.toLowerCase() === selectedName);
+                const matched = allCustomers.find(c => c && c.name && c.name.toLowerCase() === selectedName);
                 if (matched) {
                     customerEmailInput.value = matched.email;
                     customerPhoneInput.value = matched.phone || '';
@@ -363,6 +363,7 @@
                 itemQtyInput.value = '1';
                 customProductRow.style.display = 'none';
                 customProductNameInput.value = '';
+                customProductNameInput.required = false;
 
                 renderSelectedItems();
             });
