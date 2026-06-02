@@ -45,13 +45,13 @@ def generate_invoice(order):
     
     # Header Table (Rechnung Title & Logo)
     # Using a placeholder for logo, you can change the path to your actual logo
-    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'pfad_jenseits_img_1776710470972.png')
+    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'rechnung_logo.jpg')
     
     header_data = []
     is_refund = order.get('total_amount', 0) < 0
     title_text = "<b>Stornorechnung / Gutschrift</b>" if is_refund else "<b>Rechnung</b>"
     if os.path.exists(logo_path):
-        img = Image(logo_path, width=3*cm, height=3*cm)
+        img = Image(logo_path, width=5.0*cm, height=2.8*cm)
         header_data.append([Paragraph(title_text, title_style), img])
     else:
         header_data.append([Paragraph(title_text, title_style), ""])
@@ -140,12 +140,16 @@ def generate_invoice(order):
     elements.append(total_table)
     elements.append(Spacer(1, 2*cm))
     
-    # Payment Method & Comments
+    # Payment Method, Bank Details & Comments
     footer_data = [
-        [Paragraph("<b>Zahlungsmethode</b>", styles['Normal']), Paragraph("<b>Kommentare</b>", styles['Normal'])],
-        [Paragraph(order.get('payment_method', 'Überweisung, Vorkasse'), styles['Normal']), Paragraph(order.get('notes', ''), styles['Normal'])]
+        [Paragraph("<b>Zahlungsmethode</b>", styles['Normal']), Paragraph("<b>Bankverbindung</b>", styles['Normal']), Paragraph("<b>Kommentare</b>", styles['Normal'])],
+        [
+            Paragraph(order.get('payment_method', 'Überweisung, Vorkasse'), styles['Normal']),
+            Paragraph("Patrick Frech<br/>IBAN: AT17 3456 0000 0313 5985", styles['Normal']),
+            Paragraph(order.get('notes', ''), styles['Normal'])
+        ]
     ]
-    footer_table = Table(footer_data, colWidths=[8.5*cm, 8.5*cm])
+    footer_table = Table(footer_data, colWidths=[5.5*cm, 6.0*cm, 5.5*cm])
     footer_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
