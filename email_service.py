@@ -151,6 +151,14 @@ def send_order_confirmation(order_dict, pdf_path):
     if success:
         try:
             admin_msg = _create_message(SMTP_USER, f"[KOPIE] {subject}", body_parts)
+            # Attach same files to admin copy
+            for path in attachments:
+                with open(path, "rb") as f:
+                    part = MIMEBase("application", "octet-stream")
+                    part.set_payload(f.read())
+                    encoders.encode_base64(part)
+                    part.add_header("Content-Disposition", f"attachment; filename={os.path.basename(path)}")
+                    admin_msg.attach(part)
             _send_via_smtp(admin_msg)
         except: pass
         

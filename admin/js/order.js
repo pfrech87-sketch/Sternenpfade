@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('saveStatusBtn').addEventListener('click', () => saveOrderStatus(orderId));
     document.getElementById('printInvoiceBtn').addEventListener('click', () => printInvoice(orderId));
+    document.getElementById('resendInvoiceBtn').addEventListener('click', () => resendInvoice(orderId));
 
     // Refund Modal Event Listeners
     document.getElementById('refundBtn').addEventListener('click', () => openRefundModal());
@@ -313,5 +314,32 @@ async function submitRefund(orderId) {
         alert('Fehler: ' + error.message);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Gutschrift buchen';
+    }
+}
+
+async function resendInvoice(orderId) {
+    const resendBtn = document.getElementById('resendInvoiceBtn');
+    const originalText = resendBtn.innerHTML;
+    
+    resendBtn.disabled = true;
+    resendBtn.innerHTML = 'Sende...';
+    
+    try {
+        const response = await fetch(`/api/admin/orders/${orderId}/resend`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            alert('Rechnung wurde erfolgreich erneut an den Kunden gesendet!');
+        } else {
+            throw new Error(result.error || 'Fehler beim Senden der Rechnung.');
+        }
+    } catch (error) {
+        alert('Fehler: ' + error.message);
+    } finally {
+        resendBtn.disabled = false;
+        resendBtn.innerHTML = originalText;
     }
 }

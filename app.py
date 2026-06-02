@@ -504,6 +504,45 @@ def get_order_invoice(order_id):
     finally:
         conn.close()
 
+@app.route('/api/admin/orders/<int:order_id>/resend', methods=['POST'])
+@requires_auth
+def admin_resend_invoice(order_id):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM orders WHERE id = ?', (order_id,))
+        order_row = cursor.fetchone()
+        if not order_row:
+            return jsonify({'error': 'Order not found'}), 404
+            
+        cursor.execute('SELECT * FROM order_items WHERE order_id = ?', (order_id,))
+        items_rows = cursor.fetchall()
+        
+        order_dict = dict(order_row)
+        order_dict['items'] = [dict(row) for row in items_rows]
+        
+        # Determine PDF invoice path
+        filename = f"Rechnung_{order_dict['order_number']}.pdf"
+        data_dir = os.environ.get('DATA_DIR', os.path.dirname(os.path.abspath(__file__)))
+        pdf_path = os.path.join(data_dir, 'invoices', filename)
+        
+        # If invoice PDF doesn't exist, generate it
+        if not os.path.exists(pdf_path):
+            from invoice_service import generate_invoice
+            pdf_path = generate_invoice(order_dict)
+            
+        # Send Email
+        success = send_order_confirmation(order_dict, pdf_path)
+        if success:
+            return jsonify({'success': True, 'message': 'Rechnung erfolgreich erneut gesendet!'})
+        else:
+            return jsonify({'error': 'E-Mail Versand fehlgeschlagen. Bitte SMTP-Einstellungen prüfen.'}), 500
+    except Exception as e:
+        print(f"Error in resend: {e}")
+        return jsonify({'error': f'Fehler beim Senden: {str(e)}'}), 500
+    finally:
+        conn.close()
+
 @app.route('/api/admin/orders/<int:order_id>/refund', methods=['POST'])
 @requires_auth
 def admin_refund_order(order_id):
