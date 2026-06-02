@@ -48,11 +48,13 @@ def generate_invoice(order):
     logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'pfad_jenseits_img_1776710470972.png')
     
     header_data = []
+    is_refund = order.get('total_amount', 0) < 0
+    title_text = "<b>Stornorechnung / Gutschrift</b>" if is_refund else "<b>Rechnung</b>"
     if os.path.exists(logo_path):
         img = Image(logo_path, width=3*cm, height=3*cm)
-        header_data.append([Paragraph("<b>Rechnung</b>", title_style), img])
+        header_data.append([Paragraph(title_text, title_style), img])
     else:
-        header_data.append([Paragraph("<b>Rechnung</b>", title_style), ""])
+        header_data.append([Paragraph(title_text, title_style), ""])
         
     header_table = Table(header_data, colWidths=[12*cm, 5*cm])
     header_table.setStyle(TableStyle([

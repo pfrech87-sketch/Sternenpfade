@@ -164,6 +164,25 @@ def checkout():
         
         order_id = cursor.lastrowid
         
+        # Upsert customer details
+        cust_name = data['customer_name'].strip()
+        cust_email = data['customer_email'].strip()
+        cust_phone = data.get('customer_phone', '').strip()
+        cust_address = data['billing_address'].strip()
+        if cust_name and cust_email:
+            cursor.execute('SELECT id FROM customers WHERE name = ?', (cust_name,))
+            cust_row = cursor.fetchone()
+            if cust_row:
+                cursor.execute('''
+                    UPDATE customers SET email = ?, phone = ?, billing_address = ?
+                    WHERE id = ?
+                ''', (cust_email, cust_phone, cust_address, cust_row['id']))
+            else:
+                cursor.execute('''
+                    INSERT INTO customers (name, email, phone, billing_address)
+                    VALUES (?, ?, ?, ?)
+                ''', (cust_name, cust_email, cust_phone, cust_address))
+        
         # Update order number to a proper format
         order_number = str(order_id) # Set to exact ID (e.g., 140)
         cursor.execute('UPDATE orders SET order_number = ? WHERE id = ?', (order_number, order_id))
@@ -223,7 +242,7 @@ def admin_create_order():
     if not data:
         return jsonify({'error': 'No data provided'}), 400
 
-    required_fields = ['customer_name', 'customer_email', 'billing_address', 'items']
+    required_fields = ['items']
     for field in required_fields:
         if field not in data:
             return jsonify({'error': f'Missing field: {field}'}), 400
@@ -231,6 +250,23 @@ def admin_create_order():
     items = data.get('items', [])
     if not items:
         return jsonify({'error': 'Order must contain at least one item'}), 400
+
+    # Extract and apply fallback default values if empty
+    customer_name = data.get('customer_name', '').strip()
+    if not customer_name:
+        customer_name = 'Patrick Frech'
+
+    customer_email = data.get('customer_email', '').strip()
+    if not customer_email:
+        customer_email = 'patrick.frech@hotmail.com'
+
+    customer_phone = data.get('customer_phone', '').strip()
+    if not customer_phone:
+        customer_phone = '0650 803 8987'
+
+    billing_address = data.get('billing_address', '').strip()
+    if not billing_address:
+        billing_address = 'Rechnungsstraße 1, 4493 Wolfern'
 
     total_amount = sum(item.get('price', 0) * item.get('quantity', 1) for item in items)
     
@@ -245,10 +281,10 @@ def admin_create_order():
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             'TEMP', # Placeholder
-            data['customer_name'],
-            data['customer_email'],
-            data.get('customer_phone', ''),
-            data['billing_address'],
+            customer_name,
+            customer_email,
+            customer_phone,
+            billing_address,
             data.get('shipping_address', ''),
             data.get('notes', ''),
             total_amount,
@@ -258,6 +294,26 @@ def admin_create_order():
         ))
         
         order_id = cursor.lastrowid
+        
+        # Upsert customer details
+        cust_name = customer_name.strip()
+        cust_email = customer_email.strip()
+        cust_phone = customer_phone.strip()
+        cust_address = billing_address.strip()
+        if cust_name and cust_email:
+            cursor.execute('SELECT id FROM customers WHERE name = ?', (cust_name,))
+            cust_row = cursor.fetchone()
+            if cust_row:
+                cursor.execute('''
+                    UPDATE customers SET email = ?, phone = ?, billing_address = ?
+                    WHERE id = ?
+                ''', (cust_email, cust_phone, cust_address, cust_row['id']))
+            else:
+                cursor.execute('''
+                    INSERT INTO customers (name, email, phone, billing_address)
+                    VALUES (?, ?, ?, ?)
+                ''', (cust_name, cust_email, cust_phone, cust_address))
+
         order_number = str(order_id)
         cursor.execute('UPDATE orders SET order_number = ? WHERE id = ?', (order_number, order_id))
         
@@ -445,6 +501,221 @@ def get_order_invoice(order_id):
             return jsonify({'error': 'Invoice PDF not found'}), 404
             
         return send_file(filepath, as_attachment=True)
+    finally:
+        conn.close()
+
+@app.route('/api/admin/orders/<int:order_id>/refund', methods=['POST'])
+@requires_auth
+def admin_refund_order(order_id):
+    data = request.json
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    refund_type = data.get('refund_type')
+    if refund_type not in ['full', 'items', 'custom']:
+        return jsonify({'error': 'Invalid refund type'}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # 1. Fetch original order
+        cursor.execute('SELECT * FROM orders WHERE id = ?', (order_id,))
+        original_order = cursor.fetchone()
+        if not original_order:
+            return jsonify({'error': 'Original order not found'}), 404
+
+        original_order_dict = dict(original_order)
+
+        # 2. Fetch original order items
+        cursor.execute('SELECT * FROM order_items WHERE order_id = ?', (order_id,))
+        original_items = cursor.fetchall()
+        original_items_dict = [dict(item) for item in original_items]
+
+        # 3. Determine refund items and total amount
+        refund_items = []
+        refund_total = 0.0
+
+        if refund_type == 'full':
+            for item in original_items_dict:
+                item_qty = item['quantity']
+                item_price = item['price']
+                refund_items.append({
+                    'name': f"Storno: {item['item_name']}",
+                    'quantity': item_qty,
+                    'price': -item_price
+                })
+                refund_total += (-item_price) * item_qty
+
+        elif refund_type == 'items':
+            selected_items = data.get('items', [])
+            if not selected_items:
+                return jsonify({'error': 'No items selected for refund'}), 400
+
+            for sel_item in selected_items:
+                # Find matching original item by name or id
+                orig_item = next((item for item in original_items_dict if item['item_name'] == sel_item['name']), None)
+                if not orig_item:
+                    return jsonify({'error': f"Item '{sel_item['name']}' not found in original order"}), 400
+
+                qty = int(sel_item.get('quantity', 0))
+                if qty <= 0 or qty > orig_item['quantity']:
+                    return jsonify({'error': f"Invalid quantity for item '{sel_item['name']}'"}), 400
+
+                refund_items.append({
+                    'name': f"Storno: {orig_item['item_name']}",
+                    'quantity': qty,
+                    'price': -orig_item['price']
+                })
+                refund_total += (-orig_item['price']) * qty
+
+        elif refund_type == 'custom':
+            custom_name = data.get('custom_name', '').strip()
+            custom_price = data.get('custom_price', 0)
+            try:
+                custom_price = float(custom_price)
+            except ValueError:
+                return jsonify({'error': 'Invalid custom price'}), 400
+
+            if not custom_name:
+                custom_name = "Gutschrift / Freibetrag"
+            else:
+                custom_name = f"Gutschrift: {custom_name}"
+
+            if custom_price <= 0:
+                return jsonify({'error': 'Refund amount must be positive'}), 400
+
+            refund_items.append({
+                'name': custom_name,
+                'quantity': 1,
+                'price': -custom_price
+            })
+            refund_total = -custom_price
+
+        # 4. Insert refund order
+        cursor.execute('''
+            INSERT INTO orders (
+                order_number, customer_name, customer_email, customer_phone,
+                billing_address, shipping_address, notes, total_amount, payment_method, status, payment_status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            'TEMP', # Placeholder
+            original_order_dict['customer_name'],
+            original_order_dict['customer_email'],
+            original_order_dict.get('customer_phone', ''),
+            original_order_dict['billing_address'],
+            original_order_dict.get('shipping_address', ''),
+            f"Gutschrift / Storno zu Rechnung #{original_order_dict['order_number']}",
+            refund_total,
+            'Gutschrift',
+            'Erledigt',
+            'Bezahlt'
+        ))
+
+        new_order_id = cursor.lastrowid
+        new_order_number = str(new_order_id)
+        cursor.execute('UPDATE orders SET order_number = ? WHERE id = ?', (new_order_number, new_order_id))
+
+        # 5. Insert refund items
+        for r_item in refund_items:
+            cursor.execute('''
+                INSERT INTO order_items (order_id, item_name, quantity, price)
+                VALUES (?, ?, ?, ?)
+            ''', (new_order_id, r_item['name'], r_item['quantity'], r_item['price']))
+
+        conn.commit()
+
+        # 6. Fetch the newly created refund order dict
+        cursor.execute('SELECT * FROM orders WHERE id = ?', (new_order_id,))
+        refund_order_row = cursor.fetchone()
+        refund_order_dict = dict(refund_order_row)
+        refund_order_dict['items'] = refund_items
+
+        # 7. Generate PDF Invoice for refund
+        pdf_path = generate_invoice(refund_order_dict)
+
+        # 8. Send Email if requested
+        email_sent = False
+        if data.get('send_email', True):
+            print(f"[Refund] Sending refund PDF email for order {new_order_number} to {refund_order_dict.get('customer_email')}...")
+            email_sent = send_order_confirmation(refund_order_dict, pdf_path)
+            print(f"[Refund] Email sending result: {email_sent}")
+
+        return jsonify({
+            'success': True,
+            'message': 'Gutschrift/Storno erfolgreich gebucht!',
+            'order_id': new_order_id,
+            'order_number': new_order_number,
+            'email_sent': email_sent
+        }), 201
+
+    except Exception as e:
+        conn.rollback()
+        error_msg = str(e)
+        print(f"Error in refund creation: {error_msg}")
+        return jsonify({'error': f'Fehler beim Erstellen der Gutschrift: {error_msg}'}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/admin/customers', methods=['GET'])
+@requires_auth
+def get_admin_customers():
+    search_query = request.args.get('search')
+    conn = get_db_connection()
+    try:
+        if search_query:
+            customers = conn.execute(
+                'SELECT * FROM customers WHERE name LIKE ? OR email LIKE ? ORDER BY name',
+                (f'%{search_query}%', f'%{search_query}%')
+            ).fetchall()
+        else:
+            customers = conn.execute('SELECT * FROM customers ORDER BY name').fetchall()
+        return jsonify([dict(row) for row in customers])
+    finally:
+        conn.close()
+
+@app.route('/api/admin/customers/<int:customer_id>', methods=['DELETE'])
+@requires_auth
+def delete_admin_customer(customer_id):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM customers WHERE id = ?', (customer_id,))
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'Customer not found'}), 404
+        conn.commit()
+        return jsonify({'success': True, 'message': 'Customer deleted'})
+    finally:
+        conn.close()
+
+@app.route('/api/admin/customers', methods=['POST'])
+@requires_auth
+def create_admin_customer():
+    data = request.json
+    if not data or not data.get('name') or not data.get('email') or not data.get('billing_address'):
+        return jsonify({'error': 'Missing required customer fields'}), 400
+        
+    name = data['name'].strip()
+    email = data['email'].strip()
+    phone = data.get('phone', '').strip()
+    address = data['billing_address'].strip()
+    
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        # Check if exists
+        cursor.execute('SELECT id FROM customers WHERE name = ?', (name,))
+        if cursor.fetchone():
+            return jsonify({'error': 'A customer with this name already exists'}), 400
+            
+        cursor.execute('''
+            INSERT INTO customers (name, email, phone, billing_address)
+            VALUES (?, ?, ?, ?)
+        ''', (name, email, phone, address))
+        conn.commit()
+        return jsonify({'success': True, 'message': 'Customer created', 'id': cursor.lastrowid}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     finally:
         conn.close()
 

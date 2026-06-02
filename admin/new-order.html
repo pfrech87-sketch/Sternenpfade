@@ -106,23 +106,24 @@
                     <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px; color:#333;">Kundeninformationen</h3>
                     
                     <div class="form-group-col">
-                        <label for="customerName">Vor- und Nachname *</label>
-                        <input type="text" id="customerName" placeholder="z.B. Johann Becker" required>
+                        <label for="customerName">Vor- und Nachname (Optional)</label>
+                        <input type="text" id="customerName" placeholder="z.B. Johann Becker (Standard: Patrick Frech)" list="customerSuggestions">
+                        <datalist id="customerSuggestions"></datalist>
                     </div>
 
                     <div class="form-group-col">
-                        <label for="customerEmail">E-Mail Adresse *</label>
-                        <input type="email" id="customerEmail" placeholder="z.B. kunde@beispiel.de" required>
+                        <label for="customerEmail">E-Mail Adresse (Optional)</label>
+                        <input type="email" id="customerEmail" placeholder="z.B. kunde@beispiel.de (Standard: patrick.frech@hotmail.com)">
                     </div>
 
                     <div class="form-group-col">
                         <label for="customerPhone">Telefonnummer (Optional)</label>
-                        <input type="tel" id="customerPhone" placeholder="z.B. +49 170 1234567">
+                        <input type="tel" id="customerPhone" placeholder="z.B. +49 170 1234567 (Standard: 0650 803 8987)">
                     </div>
 
                     <div class="form-group-col">
-                        <label for="billingAddress">Rechnungsadresse *</label>
-                        <textarea id="billingAddress" rows="4" placeholder="Straße Hausnr.&#10;PLZ Ort&#10;Land" required></textarea>
+                        <label for="billingAddress">Rechnungsadresse (Optional)</label>
+                        <textarea id="billingAddress" rows="4" placeholder="Straße Hausnr.&#10;PLZ Ort&#10;Land (Standard: Rechnungsstraße 1, 4493 Wolfern)"></textarea>
                     </div>
 
                     <div class="form-group-col">
@@ -264,7 +265,44 @@
             const newOrderForm = document.getElementById('newOrderForm');
             const saveOrderBtn = document.getElementById('saveOrderBtn');
 
+            const customerNameInput = document.getElementById('customerName');
+            const customerEmailInput = document.getElementById('customerEmail');
+            const customerPhoneInput = document.getElementById('customerPhone');
+            const billingAddressInput = document.getElementById('billingAddress');
+
+            let allCustomers = [];
             let selectedItems = [];
+
+            // Load existing customers for autocomplete
+            async function loadCustomers() {
+                try {
+                    const response = await fetch('/api/admin/customers');
+                    if (response.ok) {
+                        allCustomers = await response.json();
+                        const datalist = document.getElementById('customerSuggestions');
+                        datalist.innerHTML = '';
+                        allCustomers.forEach(cust => {
+                            const option = document.createElement('option');
+                            option.value = cust.name;
+                            datalist.appendChild(option);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching customers:', error);
+                }
+            }
+            loadCustomers();
+
+            // Autocomplete customer data on select/input
+            customerNameInput.addEventListener('input', () => {
+                const selectedName = customerNameInput.value.trim().toLowerCase();
+                const matched = allCustomers.find(c => c.name.toLowerCase() === selectedName);
+                if (matched) {
+                    customerEmailInput.value = matched.email;
+                    customerPhoneInput.value = matched.phone || '';
+                    billingAddressInput.value = matched.billing_address;
+                }
+            });
 
             // Pre-fill fields when selecting standard product
             productSelect.addEventListener('change', () => {

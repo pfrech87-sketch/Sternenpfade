@@ -53,6 +53,34 @@ def init_db():
         )
     ''')
 
+    # Create Customers Table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS customers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE NOT NULL,
+            email TEXT NOT NULL,
+            phone TEXT,
+            billing_address TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Populate customers from existing orders if customers table is empty
+    cursor.execute('SELECT COUNT(*) as count FROM customers')
+    if cursor.fetchone()[0] == 0:
+        cursor.execute('SELECT DISTINCT customer_name, customer_email, customer_phone, billing_address FROM orders')
+        existing_orders = cursor.fetchall()
+        for row in existing_orders:
+            name = row['customer_name'].strip() if row['customer_name'] else ''
+            email = row['customer_email'].strip() if row['customer_email'] else ''
+            phone = row['customer_phone'].strip() if row['customer_phone'] else ''
+            address = row['billing_address'].strip() if row['billing_address'] else ''
+            if name and email:
+                cursor.execute('''
+                    INSERT OR IGNORE INTO customers (name, email, phone, billing_address)
+                    VALUES (?, ?, ?, ?)
+                ''', (name, email, phone, address))
+
     conn.commit()
     conn.close()
 

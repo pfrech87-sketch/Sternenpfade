@@ -69,35 +69,52 @@ def send_order_confirmation(order_dict, pdf_path):
     if not customer_email: return False
 
     items = order_dict.get('items', [])
-    is_free_order = order_dict.get('total_amount', 0) == 0
+    total_amount = order_dict.get('total_amount', 0)
+    is_free_order = total_amount == 0
+    is_refund = total_amount < 0
 
-    subject = f"Bestellbestätigung - Sternenpfade (Nr. {order_dict.get('order_number')})"
-
-    body_parts = [
-        f"Hallo {customer_name},", "",
-        "vielen lieben Dank für deine Bestellung bei Sternenpfade 🤍💙✨",
-        "dein Download ist nun bereit (als Anhang an dieser E-Mail)." if is_free_order else f"deine Bestellung Nr. {order_dict.get('order_number')} ist eingegangen.",
-        ""
-    ]
-
-    if not is_free_order:
-        body_parts.extend([
-            "Im Anhang findest du deine Rechnung als PDF-Datei.",
-            "Bitte überweise den Betrag vorab auf das auf der Rechnung angegebene Konto.",
-            "Sobald die Zahlung eingelangt ist, beginne ich mit der Bearbeitung.",
+    if is_refund:
+        subject = f"Gutschrift / Stornorechnung - Sternenpfade (Nr. {order_dict.get('order_number')})"
+        body_parts = [
+            f"Hallo {customer_name},", "",
+            f"anbei findest du deine Gutschrift / Stornorechnung Nr. {order_dict.get('order_number')} als PDF-Datei.",
+            "Der Betrag wurde entsprechend erstattet bzw. gutgeschrieben.",
+            "",
+            "Bei Fragen stehen wir dir jederzeit gerne zur Verfügung.",
+            "",
+            "Von Herzen danke für dein Vertrauen.",
+            "",
+            "Herzensgruß",
+            "Patrick",
+            "✨ www.sternenpfade.at"
+        ]
+    else:
+        subject = f"Bestellbestätigung - Sternenpfade (Nr. {order_dict.get('order_number')})"
+        body_parts = [
+            f"Hallo {customer_name},", "",
+            "vielen lieben Dank für deine Bestellung bei Sternenpfade 🤍💙✨",
+            "dein Download ist nun bereit (als Anhang an dieser E-Mail)." if is_free_order else f"deine Bestellung Nr. {order_dict.get('order_number')} ist eingegangen.",
             ""
+        ]
+
+        if not is_free_order:
+            body_parts.extend([
+                "Im Anhang findest du deine Rechnung als PDF-Datei.",
+                "Bitte überweise den Betrag vorab auf das auf der Rechnung angegebene Konto.",
+                "Sobald die Zahlung eingelangt ist, beginne ich mit der Bearbeitung.",
+                ""
+            ])
+        
+        body_parts.extend([
+            "Wenn es sich um eine Tierkommunikation oder einen Jenseitskontakt handelt, nehme ich mir dafür bewusst Zeit.",
+            "Falls noch Informationen fehlen, melde ich mich persönlich bei dir.",
+            "",
+            "Von Herzen danke für dein Vertrauen.",
+            "",
+            "Herzensgruß",
+            "Patrick",
+            "✨ www.sternenpfade.at"
         ])
-    
-    body_parts.extend([
-        "Wenn es sich um eine Tierkommunikation oder einen Jenseitskontakt handelt, nehme ich mir dafür bewusst Zeit.",
-        "Falls noch Informationen fehlen, melde ich mich persönlich bei dir.",
-        "",
-        "Von Herzen danke für dein Vertrauen.",
-        "",
-        "Herzensgruß",
-        "Patrick",
-        "✨ www.sternenpfade.at"
-    ])
 
     msg = _create_message(customer_email, subject, body_parts)
 

@@ -6,6 +6,99 @@
     <title>Bestellung Details - Sternenpfade Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
+    <style>
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 650px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #888;
+        }
+        .close-modal-btn:hover {
+            color: #000;
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .radio-label input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .form-group-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group-col input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .form-group-col label {
+            font-weight: 500;
+            color: #555;
+            font-size: 14px;
+        }
+        .order-items-list-table th, .order-items-list-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 14px;
+        }
+        .checkbox-container input {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-container">
@@ -82,10 +175,92 @@
 
 
 
-                <div class="card action-card flex-between">
-                    <button class="btn btn-red">Löschen</button>
-                    <button id="printInvoiceBtn" class="btn btn-default">📄 Rechnung downloaden &darr;</button>
+                <div class="card action-card" style="display: flex; flex-direction: column; gap: 10px;">
+                    <button id="refundBtn" class="btn" style="background-color: #ff9800; color: white; font-weight: 600; width: 100%;">💸 Storno / Gutschrift erstellen</button>
+                    <div class="flex-between" style="width: 100%; gap: 10px;">
+                        <button class="btn btn-red" style="flex: 1;">Löschen</button>
+                        <button id="printInvoiceBtn" class="btn btn-default" style="flex: 1.5; font-size: 13px; padding: 8px 10px;">📄 Rechnung downloaden &darr;</button>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refund/Storno Modal -->
+    <div id="refundModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Storno / Gutschrift für Bestellung #<span id="refundOrderNumberDisplay">...</span></h2>
+                <button class="close-modal-btn" id="closeRefundModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group-col" style="margin-bottom: 20px;">
+                    <label><strong>Gutschriftsart auswählen:</strong></label>
+                    <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                        <label class="radio-label">
+                            <input type="radio" name="refundType" value="full" checked>
+                            <span>Ganze Bestellung stornieren</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="refundType" value="items">
+                            <span>Einzelne Produkte stornieren</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="refundType" value="custom">
+                            <span>Freier Betrag / Freie Gutschrift</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Items list for itemized refund (hidden by default) -->
+                <div id="refundItemsSection" style="display: none; border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 20px; background: #fdfdfc;">
+                    <h4 style="margin-top: 0; margin-bottom: 10px;">Produkte auswählen & Menge anpassen:</h4>
+                    <table class="order-items-list-table" style="width:100%; border-collapse: collapse; font-size: 14px;">
+                        <thead>
+                            <tr style="background:#f5f5f3; border-bottom:1px solid #eee;">
+                                <th style="padding: 8px; text-align: left; width: 40px;">Auswahl</th>
+                                <th style="padding: 8px; text-align: left;">Produkt</th>
+                                <th style="padding: 8px; text-align: right;">Einzelpreis</th>
+                                <th style="padding: 8px; text-align: center; width: 80px;">Menge</th>
+                                <th style="padding: 8px; text-align: right;">Gesamt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="refundItemsBody">
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Custom refund section (hidden by default) -->
+                <div id="refundCustomSection" style="display: none; border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 20px; background: #fdfdfc;">
+                    <h4 style="margin-top: 0; margin-bottom: 10px;">Benutzerdefinierte Gutschrift:</h4>
+                    <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 15px;">
+                        <div class="form-group-col">
+                            <label for="customRefundName">Beschreibung der Gutschrift</label>
+                            <input type="text" id="customRefundName" placeholder="z.B. Kulanzgutschrift / Teilerstattung">
+                        </div>
+                        <div class="form-group-col">
+                            <label for="customRefundAmount">Betrag (€) (wird negativ gebucht)</label>
+                            <input type="number" id="customRefundAmount" min="0.01" step="0.01" value="0.00">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Send email option -->
+                <div style="margin-bottom: 20px;">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="sendRefundEmail" checked>
+                        <span><strong>Gutschrift direkt per E-Mail senden</strong> (Gutschrifts-PDF wird generiert und an den Kunden geschickt)</span>
+                    </label>
+                </div>
+
+                <div class="refund-total-summary" style="font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
+                    Rückerstattungsbetrag: <span id="refundTotalDisplay" style="color: #e53935;">€ 0,00</span>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; padding-top: 15px;">
+                <button id="cancelRefundBtn" class="btn btn-default">Abbrechen</button>
+                <button id="submitRefundBtn" class="btn btn-green" style="background-color: #e53935; color: white;">Gutschrift buchen</button>
             </div>
         </div>
     </div>
