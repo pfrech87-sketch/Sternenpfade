@@ -727,6 +727,42 @@ def delete_admin_customer(customer_id):
     finally:
         conn.close()
 
+@app.route('/api/admin/customers/<int:customer_id>', methods=['PUT'])
+@requires_auth
+def update_admin_customer(customer_id):
+    data = request.json
+    if not data or not data.get('name') or not data.get('email') or not data.get('billing_address'):
+        return jsonify({'error': 'Missing required customer fields'}), 400
+        
+    name = data['name'].strip()
+    email = data['email'].strip()
+    phone = data.get('phone', '').strip()
+    address = data['billing_address'].strip()
+    
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        
+        # Check if another customer with same name already exists
+        cursor.execute('SELECT id FROM customers WHERE name = ? AND id != ?', (name, customer_id))
+        if cursor.fetchone():
+            return jsonify({'error': 'A customer with this name already exists'}), 400
+            
+        cursor.execute('''
+            UPDATE customers SET name = ?, email = ?, phone = ?, billing_address = ?
+            WHERE id = ?
+        ''', (name, email, phone, address, customer_id))
+        
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'Customer not found'}), 404
+            
+        conn.commit()
+        return jsonify({'success': True, 'message': 'Customer updated'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
 @app.route('/api/admin/customers', methods=['POST'])
 @requires_auth
 def create_admin_customer():

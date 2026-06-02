@@ -11,6 +11,74 @@
             white-space: pre-line;
             max-width: 300px;
         }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #888;
+        }
+        .close-modal-btn:hover {
+            color: #000;
+        }
+        .form-group-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group-col label {
+            font-weight: 500;
+            color: #555;
+            font-size: 14px;
+        }
+        .form-group-col input, .form-group-col textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .form-group-col input:focus, .form-group-col textarea:focus {
+            outline: none;
+            border-color: #7cb342;
+        }
     </style>
 </head>
 <body>
@@ -40,7 +108,7 @@
                         <th>E-Mail</th>
                         <th>Telefonnummer</th>
                         <th>Rechnungsadresse</th>
-                        <th style="width: 100px; text-align: center;">Aktionen</th>
+                        <th style="width: 150px; text-align: center;">Aktionen</th>
                     </tr>
                 </thead>
                 <tbody id="customersBody">
@@ -52,10 +120,48 @@
         </div>
     </div>
 
+    <!-- Edit Customer Modal -->
+    <div id="editCustomerModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Kunde bearbeiten</h2>
+                <button class="close-modal-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editCustomerForm">
+                <input type="hidden" id="editCustomerId">
+                <div class="form-group-col">
+                    <label for="editCustomerName">Vor- und Nachname *</label>
+                    <input type="text" id="editCustomerName" required>
+                </div>
+                <div class="form-group-col">
+                    <label for="editCustomerEmail">E-Mail Adresse *</label>
+                    <input type="email" id="editCustomerEmail" required>
+                </div>
+                <div class="form-group-col">
+                    <label for="editCustomerPhone">Telefonnummer (Optional)</label>
+                    <input type="text" id="editCustomerPhone">
+                </div>
+                <div class="form-group-col">
+                    <label for="editCustomerAddress">Rechnungsadresse *</label>
+                    <textarea id="editCustomerAddress" rows="4" required></textarea>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px;">
+                    <button type="button" class="btn btn-default" onclick="closeEditModal()">Abbrechen</button>
+                    <button type="submit" class="btn btn-green" id="saveCustomerBtn">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        let activeCustomers = [];
+
         document.addEventListener('DOMContentLoaded', () => {
             fetchCustomers();
             document.getElementById('searchInput').addEventListener('input', fetchCustomers);
+            
+            // Wire up submit event on edit form
+            document.getElementById('editCustomerForm').addEventListener('submit', handleEditSubmit);
         });
 
         async function fetchCustomers() {
@@ -69,6 +175,7 @@
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch customers');
                 const customers = await response.json();
+                activeCustomers = customers;
                 renderCustomers(customers);
             } catch (error) {
                 console.error('Error fetching customers:', error);
@@ -92,12 +199,71 @@
                     <td><a href="mailto:${customer.email}">${customer.email}</a></td>
                     <td>${customer.phone || '-'}</td>
                     <td class="address-cell">${customer.billing_address}</td>
-                    <td style="text-align: center;">
+                    <td style="text-align: center; white-space: nowrap;">
+                        <button class="btn btn-sm btn-default" onclick="openEditModal(${customer.id})" style="margin-right: 5px;">Bearbeiten</button>
                         <button class="btn btn-sm btn-red" onclick="deleteCustomer(${customer.id})">Löschen</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        function openEditModal(id) {
+            const customer = activeCustomers.find(c => c.id === id);
+            if (!customer) return;
+            
+            document.getElementById('editCustomerId').value = customer.id;
+            document.getElementById('editCustomerName').value = customer.name;
+            document.getElementById('editCustomerEmail').value = customer.email;
+            document.getElementById('editCustomerPhone').value = customer.phone || '';
+            document.getElementById('editCustomerAddress').value = customer.billing_address;
+            
+            document.getElementById('editCustomerModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editCustomerModal').style.display = 'none';
+        }
+
+        async function handleEditSubmit(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editCustomerId').value;
+            const payload = {
+                name: document.getElementById('editCustomerName').value.trim(),
+                email: document.getElementById('editCustomerEmail').value.trim(),
+                phone: document.getElementById('editCustomerPhone').value.trim(),
+                billing_address: document.getElementById('editCustomerAddress').value.trim()
+            };
+            
+            const saveBtn = document.getElementById('saveCustomerBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = 'Speichert...';
+            
+            try {
+                const response = await fetch(`/api/admin/customers/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    alert('Kundendaten erfolgreich aktualisiert!');
+                    closeEditModal();
+                    fetchCustomers();
+                } else {
+                    throw new Error(result.error || 'Fehler beim Aktualisieren der Kundendaten.');
+                }
+            } catch (error) {
+                alert('Fehler: ' + error.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Speichern';
+            }
         }
 
         async function deleteCustomer(id) {

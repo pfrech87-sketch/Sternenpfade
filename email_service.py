@@ -18,15 +18,26 @@ DIGITAL_PRODUCTS = {
     "Gratis Download: Herzens-Verständnis": "https://www.sternenpfade.at/downloads/herzens-verstaendnis.pdf",
     "Gratis Download Herzens-Verstaendnis": "https://www.sternenpfade.at/downloads/herzens-verstaendnis.pdf",
     "Heilreise mit Anubis": "https://www.sternenpfade.at/downloads/anubis-meditation.mp3",
-    "Zurueck in deine Mitte": "https://www.sternenpfade.at/downloads/zurueck-in-deine-mitte.mp3"
+    "Friedensreise mit Anubis": "https://www.sternenpfade.at/downloads/anubis-meditation.mp3",
+    "Friedensreise mit Anubis (Meditation)": "https://www.sternenpfade.at/downloads/anubis-meditation.mp3",
+    "Zurueck in deine Mitte": "https://www.sternenpfade.at/downloads/zurueck-in-deine-mitte.mp3",
+    "Zurueck in deine Kraft": "https://www.sternenpfade.at/downloads/zurueck-in-deine-mitte.mp3",
+    "Zurück in deine Kraft": "https://www.sternenpfade.at/downloads/zurueck-in-deine-mitte.mp3",
+    "Zurueck in deine Kraft (Meditation)": "https://www.sternenpfade.at/downloads/zurueck-in-deine-mitte.mp3",
+    "Zurück in deine Kraft (Meditation)": "https://www.sternenpfade.at/downloads/zurueck-in-deine-mitte.mp3"
 }
 
 DIGITAL_PRODUCT_FILES = {
     "Gratis Download: Herzens-Verständnis": "Impulse zur Tierkommunikation.pdf",
     "Gratis Download Herzens-Verstaendnis": "Impulse zur Tierkommunikation.pdf",
     "Friedensreise mit Anubis": "anubis-meditation.mp3",
+    "Friedensreise mit Anubis (Meditation)": "anubis-meditation.mp3",
     "Heilreise mit Anubis": "anubis-meditation.mp3",
-    "Zurueck in deine Mitte": "zurueck-in-deine-mitte.mp3"
+    "Zurueck in deine Mitte": "zurueck-in-deine-mitte.mp3",
+    "Zurueck in deine Kraft": "zurueck-in-deine-mitte.mp3",
+    "Zurück in deine Kraft": "zurueck-in-deine-mitte.mp3",
+    "Zurueck in deine Kraft (Meditation)": "zurueck-in-deine-mitte.mp3",
+    "Zurück in deine Kraft (Meditation)": "zurueck-in-deine-mitte.mp3"
 }
 
 

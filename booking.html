@@ -179,8 +179,504 @@
             </div>
 
 
+            <!-- Interactive Pfadfinder Wegweiser-Quiz -->
+            <style>
+                .quiz-container {
+                    background: rgba(255, 255, 255, 0.03);
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 24px;
+                    margin-bottom: 5rem;
+                    padding: 2.5rem;
+                    border-color: rgba(255, 105, 180, 0.4);
+                    overflow: hidden;
+                    position: relative;
+                    scroll-margin-top: 100px;
+                }
+                .quiz-option-btn {
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.15);
+                    border-radius: 12px;
+                    padding: 1.8rem 1.2rem;
+                    color: var(--c-white);
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                    text-align: center;
+                    font-family: inherit;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                }
+                .quiz-option-btn:hover {
+                    background: rgba(255, 255, 255, 0.12);
+                    border-color: var(--c-pink);
+                    transform: translateY(-4px);
+                    box-shadow: 0 8px 25px rgba(226, 49, 121, 0.25);
+                }
+                .quiz-option-btn:active {
+                    transform: scale(0.98);
+                }
+                .quiz-option-btn strong {
+                    font-size: 1.25rem;
+                    font-weight: 500;
+                    display: block;
+                    margin-top: 0.25rem;
+                    line-height: 1.3;
+                }
+                .quiz-option-btn span:not(.option-icon) {
+                    font-size: 1rem !important;
+                    color: rgba(255, 255, 255, 0.75) !important;
+                    display: block;
+                    margin-top: 0.5rem;
+                    line-height: 1.4;
+                    font-weight: 300;
+                }
+                .quiz-option-btn .option-icon {
+                    font-size: 2.2rem !important;
+                    margin-bottom: 0.5rem;
+                }
+                .quiz-question {
+                    font-size: 1.45rem !important;
+                    font-weight: 500;
+                    margin-bottom: 2rem !important;
+                    line-height: 1.4;
+                }
+                .quiz-back-btn {
+                    background: none;
+                    border: none;
+                    color: rgba(255,255,255,0.6);
+                    cursor: pointer;
+                    font-size: 1.1rem;
+                    transition: color 0.2s;
+                    font-weight: 500;
+                    margin-top: 1.5rem;
+                    padding: 0.5rem 1rem;
+                }
+                .quiz-back-btn:hover {
+                    color: var(--c-white);
+                }
+                .quiz-result-card {
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    border-radius: 16px;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                }
+                .quiz-result-card:hover {
+                    border-color: var(--c-teal);
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 30px rgba(0,188,212,0.15);
+                }
+                
+                @media (max-width: 768px) {
+                    .quiz-container {
+                        padding: 1.8rem 1.2rem;
+                        margin-bottom: 3rem;
+                    }
+                    .quiz-option-btn {
+                        padding: 1.4rem 1rem;
+                    }
+                    .quiz-question {
+                        font-size: 1.3rem !important;
+                        margin-bottom: 1.5rem !important;
+                    }
+                    .quiz-option-btn strong {
+                        font-size: 1.15rem;
+                    }
+                    .quiz-option-btn span:not(.option-icon) {
+                        font-size: 0.95rem !important;
+                        margin-top: 0.4rem;
+                    }
+                    .quiz-option-btn .option-icon {
+                        font-size: 1.8rem !important;
+                        margin-bottom: 0.4rem;
+                    }
+                    .quiz-back-btn {
+                        font-size: 1rem;
+                        margin-top: 1rem;
+                    }
+                }
+            </style>
+
+            <div id="quiz" class="glass-card quiz-container">
+                <div class="quiz-header" style="text-align: center; margin-bottom: 2rem;">
+                    <span class="quiz-badge" style="background: rgba(255, 105, 180, 0.15); color: var(--c-pink); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Pfadfinder-Wegweiser</span>
+                    <h2 style="margin-top: 1rem; margin-bottom: 0.5rem; color: var(--c-white);">Welchen Pfad suchst du?</h2>
+                    <p style="color: rgba(255,255,255,0.8); max-width: 600px; margin: 0 auto; font-size: 0.95rem;">Finde in 4 kurzen Schritten heraus, welche Begleitung oder Meditation am besten zu deiner aktuellen Lebenssituation passt.</p>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="quiz-progress-wrapper" style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 2.5rem; position: relative; overflow: hidden;">
+                    <div id="quiz-progress-bar" style="width: 25%; height: 100%; background: linear-gradient(to right, var(--c-pink), var(--c-teal)); border-radius: 10px; transition: width 0.4s ease;"></div>
+                </div>
+
+                <!-- Quiz Steps -->
+                <div class="quiz-steps-container" style="position: relative; min-height: 280px;">
+                    <!-- Step 1: Zielgruppe -->
+                    <div class="quiz-step" id="step-1" style="transition: opacity 0.3s ease, transform 0.3s ease;">
+                        <h3 class="quiz-question" style="text-align: center; margin-bottom: 1.5rem; color: var(--c-gold); font-size: 1.25rem;">1. Wer steht im Mittelpunkt der Begleitung?</h3>
+                        <div class="quiz-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem;">
+                            <button type="button" class="quiz-option-btn" data-tag="tier" onclick="selectOption(1, 'tier')">
+                                <span class="option-icon" style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem;">🐾</span>
+                                <strong>Mein geliebtes Tier</strong>
+                                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Hund, Katze, Pferd etc.</span>
+                            </button>
+                            <button type="button" class="quiz-option-btn" data-tag="mensch" onclick="selectOption(1, 'mensch')">
+                                <span class="option-icon" style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem;">✨</span>
+                                <strong>Ich selbst</strong>
+                                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Wachstum, Krise, Stärkung</span>
+                            </button>
+                            <button type="button" class="quiz-option-btn" data-tag="jenseits" onclick="selectOption(1, 'jenseits')">
+                                <span class="option-icon" style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem;">🌈</span>
+                                <strong>Verstorbener Gefährte</strong>
+                                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Trauer &amp; Abschied</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Thema -->
+                    <div class="quiz-step" id="step-2" style="display: none; transition: opacity 0.3s ease, transform 0.3s ease;">
+                        <h3 class="quiz-question" style="text-align: center; margin-bottom: 1.5rem; color: var(--c-gold); font-size: 1.25rem;">2. Welches Thema beschreibt dein Anliegen am besten?</h3>
+                        
+                        <!-- Dynamic sub-options depending on Step 1 selection -->
+                        <div id="step-2-options-tier" class="step-2-suboptions" style="display: none;">
+                            <div class="quiz-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem;">
+                                <button type="button" class="quiz-option-btn" data-tag="kommunikation" onclick="selectOption(2, 'kommunikation')">
+                                    <strong>Gedanken &amp; Gefühle verstehen</strong>
+                                    <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Telepathische Verbindung</span>
+                                </button>
+                                <button type="button" class="quiz-option-btn" data-tag="coaching" onclick="selectOption(2, 'coaching')">
+                                    <strong>Beziehung &amp; Spiegelung klären</strong>
+                                    <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Verhalten &amp; Traumata lösen</span>
+                                </button>
+                                <button type="button" class="quiz-option-btn" data-tag="energiearbeit" onclick="selectOption(2, 'energiearbeit')">
+                                    <strong>Energetische Blockaden &amp; Kraft</strong>
+                                    <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Chakren &amp; Vitalisierung</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="step-2-options-mensch" class="step-2-suboptions" style="display: none;">
+                            <div class="quiz-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem;">
+                                <button type="button" class="quiz-option-btn" data-tag="energiearbeit" onclick="selectOption(2, 'energiearbeit')">
+                                    <strong>Blockaden lösen &amp; Kraft tanken</strong>
+                                    <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Seelenreinigung &amp; Entlastung</span>
+                                </button>
+                                <button type="button" class="quiz-option-btn" data-tag="coaching" onclick="selectOption(2, 'coaching')">
+                                    <strong>Lebenskrisen &amp; Begleitung</strong>
+                                    <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">9-Wochen Coachingprogramm</span>
+                                </button>
+                                <button type="button" class="quiz-option-btn" data-tag="kinder" onclick="selectOption(2, 'kinder')">
+                                    <strong>Unterstützung für mein Kind</strong>
+                                    <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Babys, Kinder &amp; Jugendliche</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="step-2-options-jenseits" class="step-2-suboptions" style="display: none;">
+                            <div class="quiz-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem;">
+                                <button type="button" class="quiz-option-btn" data-tag="jenseitskontakt" onclick="selectOption(2, 'jenseitskontakt')">
+                                    <strong>Kontakt zur Seele im Licht</strong>
+                                    <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Medialer Jenseitskontakt</span>
+                                </button>
+                                <button type="button" class="quiz-option-btn" data-tag="abschied" onclick="selectOption(2, 'abschied')">
+                                    <strong>Trauerbewältigung &amp; Trost</strong>
+                                    <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Begleitung beim Gehenlassen</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Back Button -->
+                        <div style="text-align: center;">
+                            <button type="button" class="quiz-back-btn" onclick="prevStep()">&larr; Zurück</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Format -->
+                    <div class="quiz-step" id="step-3" style="display: none; transition: opacity 0.3s ease, transform 0.3s ease;">
+                        <h3 class="quiz-question" style="text-align: center; margin-bottom: 1.5rem; color: var(--c-gold); font-size: 1.25rem;">3. Wie möchtest du die Begleitung erleben?</h3>
+                        <div class="quiz-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem;">
+                            <button type="button" class="quiz-option-btn" data-tag="live" onclick="selectOption(3, 'live')">
+                                <strong>Live &amp; Interaktiv</strong>
+                                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Videoanruf oder Praxis vor Ort</span>
+                            </button>
+                            <button type="button" class="quiz-option-btn" data-tag="fern" onclick="selectOption(3, 'fern')">
+                                <strong>Flexibel im Hintergrund</strong>
+                                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Fernarbeit mit Sprachnachricht</span>
+                            </button>
+                            <button type="button" class="quiz-option-btn" data-tag="selbst" onclick="selectOption(3, 'selbst')">
+                                <strong>Selbststudium &amp; Meditation</strong>
+                                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Für mich zu Hause anhören</span>
+                            </button>
+                        </div>
+
+                        <!-- Back Button -->
+                        <div style="text-align: center;">
+                            <button type="button" class="quiz-back-btn" onclick="prevStep()">&larr; Zurück</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Intensität -->
+                    <div class="quiz-step" id="step-4" style="display: none; transition: opacity 0.3s ease, transform 0.3s ease;">
+                        <h3 class="quiz-question" style="text-align: center; margin-bottom: 1.5rem; color: var(--c-gold); font-size: 1.25rem;">4. Wie intensiv soll die Unterstützung sein?</h3>
+                        <div class="quiz-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem;">
+                            <button type="button" class="quiz-option-btn" data-tag="einzel" onclick="selectOption(4, 'einzel')">
+                                <strong>Einmaliger Impuls</strong>
+                                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Für ein konkretes Anliegen</span>
+                            </button>
+                            <button type="button" class="quiz-option-btn" data-tag="intensiv" onclick="selectOption(4, 'intensiv')">
+                                <strong>Mehrwöchige Begleitung</strong>
+                                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Für nachhaltige Transformation</span>
+                            </button>
+                            <button type="button" class="quiz-option-btn" data-tag="einstieg" onclick="selectOption(4, 'einstieg')">
+                                <strong>Kurzer Einstieg / Meditation</strong>
+                                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: block; margin-top: 0.3rem;">Zum Reinschnuppern</span>
+                            </button>
+                        </div>
+
+                        <!-- Back Button -->
+                        <div style="text-align: center;">
+                            <button type="button" class="quiz-back-btn" onclick="prevStep()">&larr; Zurück</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Results -->
+                    <div class="quiz-step" id="quiz-results-step" style="display: none; transition: opacity 0.4s ease, transform 0.4s ease;">
+                        <h3 style="text-align: center; margin-bottom: 1.5rem; color: var(--c-teal); font-size: 1.5rem;">Deine empfohlenen Pfade:</h3>
+                        
+                        <div id="quiz-results-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                            <!-- Dynamic recommended items will go here -->
+                        </div>
+
+                        <div style="text-align: center;">
+                            <button type="button" class="btn btn-secondary" onclick="restartQuiz()" style="border-color: var(--c-pink); color: var(--c-white);">Quiz neu starten</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const quizProducts = [
+                    {
+                        name: "Schamanische Tierkommunikation",
+                        tags: ["tier", "kommunikation", "fern", "einzel"],
+                        price: "90 €",
+                        image: "assets/Tierkommunkation-shop.jpeg",
+                        desc: "Verstehe die Seele deines Tieres auf tiefer Ebene. Erhalte authentische Antworten und energetische Begleitung.",
+                        link: "tierkommunikation-detail.html",
+                        color: "var(--c-teal)"
+                    },
+                    {
+                        name: "Jenseitskontakt für Tiere",
+                        tags: ["jenseits", "jenseitskontakt", "fern", "einzel"],
+                        price: "90 €",
+                        image: "assets/Jenseits-kategorie.jpeg",
+                        desc: "Tröstende Verbindung mit der Seele deines verstorbenen Tieres. Finde Antworten und spüre anhaltende Liebe.",
+                        link: "jenseitskontakt-tiere-detail.html",
+                        color: "var(--c-gold)"
+                    },
+                    {
+                        name: "Seelenfeld Kompass: Duo-Coaching",
+                        tags: ["tier", "coaching", "live", "einzel"],
+                        price: "150 €",
+                        image: "assets/seelenfeld_kompass.jpg",
+                        desc: "Ein exklusives 1:1 Coaching für dich und dein Tier. Wir beleuchten eure gemeinsame Dynamik.",
+                        link: "checkout.html?item=Seelenfeld+Kompass+Duo-Coaching&price=150",
+                        color: "var(--c-pink)"
+                    },
+                    {
+                        name: "Kraftsegen für Tiere",
+                        tags: ["tier", "energiearbeit", "fern", "einzel"],
+                        price: "40 €",
+                        image: "assets/kraftsegen.jpg",
+                        desc: "Eine energetische Stärkung und Blockadenlösung für dein Tier, durchgeführt über die Ferne.",
+                        link: "checkout.html?item=Kraftsegen+fuer+Tiere&price=40",
+                        color: "var(--c-teal)"
+                    },
+                    {
+                        name: "Soul Link",
+                        tags: ["tier", "coaching", "live", "einzel"],
+                        price: "120 €",
+                        image: "assets/soul_link_augen_nebula_1776884702696.png",
+                        desc: "Eine geführte energetische Symbiose aus Hypnose und schamanischer Trance für dich und dein Tier.",
+                        link: "soul-link-detail.html",
+                        color: "var(--c-violet)"
+                    },
+                    {
+                        name: "Sternenpfade Lebensbegleitung",
+                        tags: ["mensch", "coaching", "live", "intensiv"],
+                        price: "450 €",
+                        image: "assets/sternenpfade_lebensbegleitung.jpg",
+                        desc: "Intensive 9-wöchige schamanische Begleitung mit 3 Sitzungen und kontinuierlichem WhatsApp-Support.",
+                        link: "sternenpfade-lebensbegleitung-detail.html",
+                        color: "var(--c-pink)"
+                    },
+                    {
+                        name: "Schamanische Sitzung (Online/Präsenz)",
+                        tags: ["mensch", "energiearbeit", "live", "einzel"],
+                        price: "120 € / 150 €",
+                        image: "assets/lebensbegleitung_soft.png",
+                        desc: "Tiefe energetische Arbeit (Seelenrückholung, Aura-Reinigung) vor Ort in der Praxis oder via Videoanruf.",
+                        link: "schamanische-sitzung-detail.html",
+                        color: "var(--c-teal)"
+                    },
+                    {
+                        name: "Schamanische Fernbehandlung",
+                        tags: ["mensch", "energiearbeit", "fern", "einzel"],
+                        price: "120 €",
+                        image: "assets/kategorie_mensch-belgeitung2.jpeg",
+                        desc: "Energetische Reinigung und Blockadenlösung, ganz ohne Präsenz. Erhalt per bequemer Sprachnachricht.",
+                        link: "schamanische-fernbehandlung-detail.html",
+                        color: "var(--c-teal)"
+                    },
+                    {
+                        name: "Schamanische Kinderbegleitung",
+                        tags: ["mensch", "kinder", "live", "einzel"],
+                        price: "90 €",
+                        image: "assets/sternenlicht_soft.png",
+                        desc: "Sanfte energetische Unterstützung für hochsensible, spirituelle oder unruhige Kinderseelen.",
+                        link: "kinderbegleitung-detail.html",
+                        color: "var(--c-teal)"
+                    },
+                    {
+                        name: "Schamanisches Sternzeichen Orakel",
+                        tags: ["mensch", "energiearbeit", "fern", "einzel"],
+                        price: "120 €",
+                        image: "assets/orakel_soft.png",
+                        desc: "Dein persönliches Orakel. Erfahre deine aktuellen Tendenzen und erhalte schriftliche spirituelle Impulse.",
+                        link: "sternzeichen-orakel-detail.html",
+                        color: "var(--c-gold)"
+                    },
+                    {
+                        name: "Der Pfad zur Tierkommunikation (Kurs)",
+                        tags: ["tier", "kommunikation", "selbst", "intensiv"],
+                        price: "190 €",
+                        image: "assets/pfad_kurs.jpg",
+                        desc: "Lerne in deinem eigenen Tempo telepathisch und medial mit deinen Tieren zu kommunizieren.",
+                        link: "der-pfad-zur-tierkommunikation-detail.html",
+                        color: "var(--c-teal)"
+                    },
+                    {
+                        name: "Friedensreise mit Anubis (Meditation)",
+                        tags: ["jenseits", "abschied", "selbst", "einstieg"],
+                        price: "25 €",
+                        image: "assets/anubis_meditation.jpg",
+                        desc: "Eine geführte schamanische Abschiedsreise für trauernde Halter, um Trost und Frieden zu finden.",
+                        link: "abschiedsbegleitung-detail.html",
+                        color: "var(--c-gold)"
+                    },
+                    {
+                        name: "Zurück in deine Kraft (Meditation)",
+                        tags: ["mensch", "energiearbeit", "selbst", "einstieg"],
+                        price: "25 €",
+                        image: "assets/zurueck_in_deine_kraft.jpg",
+                        desc: "Eine schamanisch gechannelte Meditation zur inneren Reinigung, Stärkung und Energieaufladung.",
+                        link: "zurueck-in-deine-kraft-detail.html",
+                        color: "var(--c-pink)"
+                    },
+                    {
+                        name: "Gratis Download: Herzens-Verständnis",
+                        tags: ["tier", "kommunikation", "selbst", "einstieg"],
+                        price: "Gratis",
+                        image: "assets/herz_download_soft.png",
+                        desc: "Mein PDF-Guide für dich zum Einstieg in die liebevolle und intuitive Tierkommunikation.",
+                        link: "checkout.html?item=Gratis+Download+Herzens-Verstaendnis&price=0",
+                        color: "var(--c-teal)"
+                    }
+                ];
+
+                let selectedTags = [];
+                let currentStep = 1;
+
+                function selectOption(step, tag) {
+                    selectedTags[step - 1] = tag;
+                    
+                    if (step === 1) {
+                        document.getElementById('step-2-options-tier').style.display = tag === 'tier' ? 'block' : 'none';
+                        document.getElementById('step-2-options-mensch').style.display = tag === 'mensch' ? 'block' : 'none';
+                        document.getElementById('step-2-options-jenseits').style.display = tag === 'jenseits' ? 'block' : 'none';
+                    }
+                    
+                    goToStep(step + 1);
+                }
+
+                function goToStep(step) {
+                    const currentStepEl = document.getElementById(`step-${currentStep}`) || document.getElementById('quiz-results-step');
+                    if (currentStepEl) currentStepEl.style.display = 'none';
+                    
+                    currentStep = step;
+                    
+                    const nextStepEl = document.getElementById(`step-${currentStep}`) || (currentStep === 5 ? document.getElementById('quiz-results-step') : null);
+                    if (nextStepEl) {
+                        nextStepEl.style.display = 'block';
+                    }
+                    
+                    const progress = (currentStep / 4) * 100;
+                    const progressBar = document.getElementById('quiz-progress-bar');
+                    if (progressBar) {
+                        progressBar.style.width = `${Math.min(progress, 100)}%`;
+                    }
+                    
+                    if (currentStep === 5) {
+                        calculateResults();
+                    }
+                }
+
+                function prevStep() {
+                    if (currentStep > 1) {
+                        goToStep(currentStep - 1);
+                    }
+                }
+
+                function restartQuiz() {
+                    selectedTags = [];
+                    goToStep(1);
+                }
+
+                function calculateResults() {
+                    const scoredProducts = quizProducts.map(product => {
+                        let score = 0;
+                        selectedTags.forEach(tag => {
+                            if (product.tags.includes(tag)) {
+                                score += 1;
+                            }
+                        });
+                        return { ...product, score };
+                    });
+                    
+                    scoredProducts.sort((a, b) => b.score - a.score);
+                    const recommendations = scoredProducts.slice(0, 3);
+                    
+                    const resultsGrid = document.getElementById('quiz-results-grid');
+                    resultsGrid.innerHTML = '';
+                    
+                    recommendations.forEach(product => {
+                        const card = document.createElement('div');
+                        card.className = 'quiz-result-card';
+                        card.innerHTML = `
+                            <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 140px; object-fit: cover;">
+                            <div style="padding: 1.2rem; display: flex; flex-direction: column; flex-grow: 1;">
+                                <h4 style="color: ${product.color}; margin-bottom: 0.5rem; font-size: 1.2rem; min-height: 2.8rem; display: flex; align-items: center; font-weight: 500;">${product.name}</h4>
+                                <p style="font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.4; margin-bottom: 1.2rem; flex-grow: 1; min-height: 70px;">${product.desc}</p>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                                    <span style="font-weight: 600; color: var(--c-gold); font-size: 1.05rem;">${product.price}</span>
+                                    <a href="${product.link}" class="btn btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; border: none; background: ${product.color}; text-decoration: none; border-radius: 6px; font-weight: 500;">Mehr erfahren</a>
+                                </div>
+                            </div>
+                        `;
+                        resultsGrid.appendChild(card);
+                    });
+                }
+            </script>
+
             <!-- Category 1: Tierbegleitung & Kommunikation -->
-            <h2 class="category-title">Tierbegleitung & Kommunikation</h2>
+            <h2 class="category-title" id="categories-start">Tierbegleitung &amp; Kommunikation</h2>
             <div class="booking-grid">
                 <!-- Schamanische Tierkommunikation -->
                 <div class="glass-card product-card">
@@ -206,7 +702,7 @@
 
                 <!-- Seelenfeld Kompass -->
                 <div class="glass-card product-card">
-                    <img src="assets/kompass_mid.png" alt="Seelenfeld Kompass"
+                    <img src="assets/seelenfeld_kompass.jpg" alt="Seelenfeld Kompass"
                         class="product-image">
                     <h4 style="color: var(--c-pink);">Seelenfeld Kompass: Duo-Coaching</h4>
                     <p style="min-height: 100px;">Exklusives Coaching für dich und dein Tier. Wir beleuchten eure gemeinsame Dynamik und finden
@@ -217,7 +713,7 @@
 
                 <!-- Kraftsegen für Tiere -->
                 <div class="glass-card product-card">
-                    <img src="assets/kraftsegen_mid.png" alt="Kraftsegen für Tiere"
+                    <img src="assets/kraftsegen.jpg" alt="Kraftsegen für Tiere"
                         class="product-image">
                     <h4 style="color: var(--c-teal);">Kraftsegen für Tiere</h4>
                     <p style="min-height: 100px;">Eine energetische Stärkung für deinen Liebling. Wir rufen harmonisierende Urkräfte an, um Vitalität und
@@ -232,8 +728,8 @@
                     <h4 style="color: var(--c-violet);">Soul Link – Durch die Augen deines Gefährten</h4>
                     <p style="min-height: 100px;">Erlebe die Welt aus der Perspektive deines Tieres. Eine tiefe schamanische Reise, die Empathie
                         und gegenseitiges Verständnis transformiert.</p>
-                    <a href="checkout.html?item=Soul+Link&price=120"
-                        class="btn btn-primary">Jetzt buchen</a>
+                    <a href="soul-link-detail.html"
+                        class="btn btn-primary">Termin vereinbaren</a>
                 </div>
 
 
@@ -244,13 +740,12 @@
             <div class="booking-grid">
                 <!-- Sternenpfade Lebensbegleitung -->
                 <div class="glass-card product-card">
-                    <img src="assets/lebensbegleitung_soft.png"
+                    <img src="assets/sternenpfade_lebensbegleitung.jpg"
                         alt="Sternenpfade Lebensbegleitung" class="product-image">
                     <h4 style="color: var(--c-pink);">Sternenpfade Lebensbegleitung</h4>
-                    <p style="min-height: 100px;">Schamanisches Coaching für deine persönlichen nächsten Schritte. Finde Stabilität, Klarheit und
-                        neue Kraft in herausfordernden Lebensphasen.</p>
-                    <a href="checkout.html?item=Sternenpfade+Lebensbegleitung&price=150"
-                        class="btn btn-primary">Jetzt buchen</a>
+                    <p style="min-height: 100px;">Intensive 9-wöchige schamanische Begleitung. Eine 3er Terminserie (Video/Live) mit zusätzlichem WhatsApp-Support für deine Transformation.</p>
+                    <a href="sternenpfade-lebensbegleitung-detail.html"
+                        class="btn btn-primary">Mehr erfahren</a>
                 </div>
 
                 <!-- Schamanische Sitzung -->
@@ -299,7 +794,7 @@
             <div class="booking-grid">
                 <!-- Der Pfad zur Tierkommunikation -->
                 <div class="glass-card product-card">
-                    <img src="assets/pfad_kurs_soft.png" alt="Der Pfad zur Tierkommunikation"
+                    <img src="assets/pfad_kurs.jpg" alt="Der Pfad zur Tierkommunikation"
                         class="product-image">
                     <h4 style="color: var(--c-teal);">Der Pfad zur Tierkommunikation (Kurs)</h4>
                     <p>Lerne in deinem eigenen Tempo, wie du telepathisch mit Tieren kommunizieren kannst. Ein
@@ -310,24 +805,23 @@
 
                 <!-- Geführte Meditation bei Tierverlust -->
                 <div class="glass-card product-card">
-                    <img src="assets/anubis_meditation_soft.png" alt="Friedensreise mit Anubis"
+                    <img src="assets/anubis_meditation.jpg" alt="Friedensreise mit Anubis"
                         class="product-image">
                     <h4 style="color: var(--c-gold);">Friedensreise mit Anubis (Meditation)</h4>
                     <p>Finde Trost und Transformation nach dem Verlust deines Tieres. Eine geführte Meditation, die dich sanft
                         durch den Abschiedsprozess begleitet.</p>
-                    <a href="checkout.html?item=Friedensreise+mit+Anubis&price=25"
-                        class="btn btn-primary">Zum Download</a>
+                    <a href="abschiedsbegleitung-detail.html"
+                        class="btn btn-primary">Mehr erfahren</a>
                 </div>
 
-                <!-- Zurück in deine Mitte -->
+                <!-- Zurück in deine Kraft -->
                 <div class="glass-card product-card">
-                    <img src="assets/mitte_soft.png" alt="Zurück in deine Mitte"
+                    <img src="assets/zurueck_in_deine_kraft.jpg" alt="Zurück in deine Kraft"
                         class="product-image">
-                    <h4 style="color: var(--c-pink);">Zurück in deine Mitte</h4>
-                    <p>Deine tägliche Energiequelle für mehr Balance und Präsenz. Eine kraftvolle Methode, um im Alltag
-                        zentriert und gelassen zu bleiben.</p>
-                    <a href="checkout.html?item=Zurueck+in+deine+Mitte&price=25"
-                        class="btn btn-primary">Zum Produkt</a>
+                    <h4 style="color: var(--c-pink);">Zurück in deine Kraft (Meditation)</h4>
+                    <p>Eine schamanisch geführte Meditation, um alten Ballast abzuleiten, dich mit neuer Energie aufzuladen und die Kraft der Spirits zu spüren.</p>
+                    <a href="zurueck-in-deine-kraft-detail.html"
+                        class="btn btn-primary">Mehr erfahren</a>
                 </div>
 
                 <!-- Gratis Download -->
