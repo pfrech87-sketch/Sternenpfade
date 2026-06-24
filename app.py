@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, send_from_directory
+from flask import Flask, request, jsonify, send_file, send_from_directory, redirect
 from flask_cors import CORS
 import sqlite3
 import os
@@ -15,6 +15,15 @@ from email_service import send_order_confirmation, send_digital_delivery
 
 # Initialize database
 init_db()
+
+# Auto-compile case studies on startup
+try:
+    print("[SYSTEM-CHECK] Starte Kompilierung der Fallbeispiele...")
+    import build_fallbeispiele
+    build_fallbeispiele.main()
+    print("[SYSTEM-CHECK] Fallbeispiele erfolgreich kompiliert!")
+except Exception as e:
+    print(f"[SYSTEM-CHECK] Warnung bei der Kompilierung der Fallbeispiele: {e}")
 
 app = Flask(__name__, 
             static_folder=os.path.dirname(os.path.abspath(__file__)), 
@@ -83,11 +92,94 @@ def serve_admin_pages(filename):
     admin_dir = os.path.join(app.static_folder, 'admin')
     return send_from_directory(admin_dir, filename)
 
+# --- CLEAN SEO-URL ROUTING ---
+
+@app.route('/dienstleistungen/tierkommunikation')
+def tierkommunikation_page():
+    return app.send_static_file('tierkommunikation-detail.html')
+
+@app.route('/dienstleistungen/jenseits-der-regenbogenbruecke')
+def jenseits_regenbogenbruecke_page():
+    return app.send_static_file('jenseitskontakt-tiere-detail.html')
+
+@app.route('/buchung')
+def buchung_page():
+    return app.send_static_file('booking.html')
+
+@app.route('/tierkommunikation-hund')
+def tierkommunikation_hund_page():
+    return app.send_static_file('tierkommunikation-hund.html')
+
+@app.route('/tierkommunikation-katze')
+def tierkommunikation_katze_page():
+    return app.send_static_file('tierkommunikation-katze.html')
+
+@app.route('/tierkommunikation-pferd')
+def tierkommunikation_pferd_page():
+    return app.send_static_file('tierkommunikation-pferd.html')
+
+@app.route('/kontakt-mit-verstorbenem-tier')
+def kontakt_verstorbenes_tier_page():
+    return app.send_static_file('kontakt-mit-verstorbenem-tier.html')
+
+@app.route('/jenseitskontakt-hund')
+def jenseitskontakt_hund_page():
+    return app.send_static_file('jenseitskontakt-hund.html')
+
+@app.route('/jenseitskontakt-katze')
+def jenseitskontakt_katze_page():
+    return app.send_static_file('jenseitskontakt-katze.html')
+
+@app.route('/fallbeispiele')
+def fallbeispiele_page():
+    return app.send_static_file('fallbeispiele.html')
+
+@app.route('/fallbeispiele/<slug>')
+def fallbeispiele_detail_page(slug):
+    # Sanitize the slug to prevent directory traversal
+    safe_slug = "".join([c for c in slug if c.isalnum() or c in '-_'])
+    filename = f"{safe_slug}.html"
+    filepath = os.path.join(app.static_folder, 'fallbeispiele', filename)
+    if os.path.exists(filepath):
+        return send_from_directory(os.path.join(app.static_folder, 'fallbeispiele'), filename)
+    return "Seite nicht gefunden", 404
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    return app.send_static_file('sitemap.xml')
+
+@app.route('/robots.txt')
+def robots_txt():
+    return app.send_static_file('robots.txt')
+
+# --- 301 Permanent Redirects for Legacy URLs ---
+
+@app.route('/tierkommunikation-detail.html')
+def redirect_tierkommunikation():
+    return redirect('/dienstleistungen/tierkommunikation', code=301)
+
+@app.route('/jenseitskontakt-tiere-detail.html')
+def redirect_jenseitskontakt_tiere():
+    return redirect('/dienstleistungen/jenseits-der-regenbogenbruecke', code=301)
+
+@app.route('/booking.html')
+def redirect_booking():
+    return redirect('/buchung', code=301)
+
+@app.route('/buchung-anmeldung')
+def redirect_buchung_anmeldung():
+    return redirect('/buchung', code=301)
+
+@app.route('/seminar-backup')
+def redirect_seminar_backup():
+    return redirect('/', code=301)
+
 @app.route('/<path:filename>')
 def serve_pages(filename):
     if filename.endswith('.html'):
         return app.send_static_file(filename)
     return send_from_directory(app.static_folder, filename)
+
 
 @app.route('/downloads/<path:filename>')
 def download_file(filename):

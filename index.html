@@ -81,7 +81,7 @@
                     <li><a href="kreise-kurse.html">Kreise & Kurse</a></li>
                     <li><a href="about.html">Über mich</a></li>
                     <li><a href="kontakt.html">Kontakt</a></li>
-                    <li><a href="booking.html" style="color: var(--c-pink); font-weight: 500;">Buchung</a></li>
+                    <li><a href="/buchung" style="color: var(--c-pink); font-weight: 500;">Buchung</a></li>
                 </ul>
             </nav>
             <button class="mobile-menu-btn" aria-label="Mobile Navigation öffnen">&#9776;</button>
@@ -110,7 +110,7 @@
 
             <div class="hero-buttons">
                 <a href="#entdecke" class="btn btn-primary">Pfade entdecken</a>
-                <a href="booking.html#live-termin" class="btn btn-secondary">Termin finden</a>
+                <a href="/buchung#live-termin" class="btn btn-secondary">Termin finden</a>
             </div>
         </div>
     </section>
@@ -129,15 +129,19 @@
                     <img src="assets/Tierkomm_Charlie.jpeg" alt="Pfad der Tiere" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 1.5rem;">
                     <h3 style="color: var(--c-teal);">Pfad der Tiere</h3>
                     <p>Die Tiere sind das Herzstück von Sternenpfade. Ob durch schamanische Tierkommunikation oder SoulLink: Vertiefe die einzigartige Verbindung zu deinem Tiergefährten auf energetischer Ebene.</p>
-                    <ul style="list-style: none; margin-top: 1rem; margin-bottom: 2rem;">
-                        <li>✨ Schamanische Tierkommunikation</li>
-                        <li>✨ SoulLink</li>
-                        <li>✨ Jenseitskontakt (exklusiv für Tiere)</li>
+                    <ul style="list-style: none; margin-top: 1rem; margin-bottom: 1.5rem;">
+                        <li>✨ <a href="/dienstleistungen/tierkommunikation" style="color: var(--c-white); text-decoration: underline;">Tierkommunikation online</a></li>
+                        <li>✨ <a href="soul-link-detail.html" style="color: var(--c-white); text-decoration: none;">SoulLink für Tiere</a></li>
+                        <li>✨ <a href="/dienstleistungen/jenseits-der-regenbogenbruecke" style="color: var(--c-white); text-decoration: none;">Jenseitskontakt mit Tieren</a></li>
                     </ul>
-                    <div class="card-footer">
+                    <p style="font-size: 0.9rem; color: var(--c-hint); margin-bottom: 1.5rem; font-weight: 400;">
+                        Spezifisch für: <a href="/tierkommunikation-hund" style="color: var(--c-teal); text-decoration: underline;">Hund</a> | <a href="/tierkommunikation-katze" style="color: var(--c-teal); text-decoration: underline;">Katze</a> | <a href="/tierkommunikation-pferd" style="color: var(--c-teal); text-decoration: underline;">Pferd</a>
+                    </p>
+                    <div class="card-footer" style="margin-top: auto;">
                         <a href="tiere.html" class="btn btn-secondary" style="width: 100%; font-size: 0.8rem;">Tier-Begleitung wählen</a>
                     </div>
                 </div>
+
 
                 <!-- Menschen -->
                 <div class="glass-card">
@@ -159,21 +163,32 @@
                     <img src="assets/Jenseits-kategorie.jpeg" alt="Pfad des Jenseits" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 1.5rem;">
                     <h3 style="color: var(--c-gold);">Pfad des Jenseits</h3>
                     <p>Der sanfte Weg über die Schwelle. Eine behutsame mediale Begleitung in Abschiedsprozessen sowie reine Jenseitskontakte – für die Gewissheit, dass Liebe keine Grenzen kennt.</p>
-                    <ul style="list-style: none; margin-top: 1rem; margin-bottom: 2rem;">
-                        <li>✨ Kontakt zu verstorbenen Tieren</li>
-                        <li>✨ Kontakt zu verstorbenen Menschen</li>
-                        <li>✨ Begleitung bei Abschiedsprozessen</li>
+                    <ul style="list-style: none; margin-top: 1rem; margin-bottom: 1.5rem;">
+                        <li>✨ <a href="/kontakt-mit-verstorbenem-tier" style="color: var(--c-white); text-decoration: underline;">Jenseitskontakt mit deinem verstorbenen Tier</a></li>
+                        <li>✨ <a href="jenseitskontakt-menschen-detail.html" style="color: var(--c-white); text-decoration: none;">Kontakt zu verstorbenen Menschen</a></li>
+                        <li>✨ <a href="abschiedsbegleitung-detail.html" style="color: var(--c-white); text-decoration: none;">Begleitung bei Abschiedsprozessen</a></li>
                     </ul>
-                    <div class="card-footer">
+                    <p style="font-size: 0.9rem; color: var(--c-hint); margin-bottom: 1.5rem; font-weight: 400;">
+                        Trost erhalten für: <a href="/jenseitskontakt-hund" style="color: var(--c-gold); text-decoration: underline;">verstorbenen Hund</a> | <a href="/jenseitskontakt-katze" style="color: var(--c-gold); text-decoration: underline;">verstorbene Katze</a>
+                    </p>
+                    <div class="card-footer" style="margin-top: auto;">
                         <a href="jenseits.html" class="btn btn-secondary" style="width: 100%; font-size: 0.8rem;">Jenseits-Begleitung wählen</a>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
 
     <!-- Wegweiser Quiz CTA Section -->
     <section class="section" style="padding: 3rem 0; background: linear-gradient(135deg, rgba(255, 105, 180, 0.05), rgba(1, 99, 149, 0.05)); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <style>
+            @media (max-width: 768px) {
+                .quiz-cta-overline { font-size: 0.9rem !important; }
+                .quiz-cta-headline { font-size: 1.9rem !important; }
+                .quiz-cta-body { font-size: 1.05rem !important; }
+            }
+        </style>
         <div class="container">
             <div class="glass-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 3.5rem 2rem; border-color: rgba(250, 180, 53, 0.3); background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: relative; overflow: hidden; border-radius: 24px;">
                 <!-- Glowing background circles -->
@@ -181,12 +196,12 @@
                 <div style="position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(1, 99, 149, 0.15) 0%, transparent 70%); bottom: -150px; right: -150px; pointer-events: none; z-index: 1;"></div>
                 
                 <div style="position: relative; z-index: 2; max-width: 700px;">
-                    <span style="color: var(--c-gold); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; font-weight: 600; display: block; margin-bottom: 0.75rem;">Kosmischer Wegweiser</span>
-                    <h2 style="font-size: 2.2rem; margin-bottom: 1rem; color: var(--c-white); margin-top: 0.5rem;">Welcher deiner Sternenpfade ruft dich?</h2>
-                    <p style="font-size: 1.15rem; color: rgba(255, 255, 255, 0.85); margin-bottom: 2rem; line-height: 1.6;">
+                    <span class="quiz-cta-overline" style="color: var(--c-gold); text-transform: uppercase; letter-spacing: 2px; font-size: 1rem; font-weight: 600; display: block; margin-bottom: 0.75rem;">Kosmischer Wegweiser</span>
+                    <h2 class="quiz-cta-headline" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--c-white); margin-top: 0.5rem;">Welcher deiner Sternenpfade ruft dich?</h2>
+                    <p class="quiz-cta-body" style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.85); margin-bottom: 2rem; line-height: 1.7;">
                         Bei meiner breiten Produktpalette ist es gar nicht so leicht, auf Anhieb das Richtige zu finden. Mein interaktiver Wegweiser führt dich in nur 4 kurzen Fragen zu den 3 passendsten Begleitungen für dich und dein Tier.
                     </p>
-                    <a href="booking.html#quiz" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.05rem; box-shadow: var(--shadow-glow);">Quiz starten & Pfad finden</a>
+                    <a href="/buchung#quiz" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem; box-shadow: var(--shadow-glow);">Quiz starten &amp; Pfad finden</a>
                 </div>
             </div>
         </div>
@@ -396,8 +411,8 @@
                 <h3 style="color: var(--c-white); margin-bottom: 1.5rem;">Digitale Welt & Dienstleistungen buchen</h3>
                 <p>Tierkommunikation ist mein Hauptangebot und Herzensweg. Entdecke hier die digitale Welt von Sternenpfade, buche deine individuellen Sitzungen direkt online oder stöbere in meinen Kursen zur eigenen Weiterentwicklung.</p>
                 <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-                    <a href="booking.html#live-termin" class="btn btn-primary">Termin buchen</a>
-                    <a href="booking.html" class="btn btn-secondary">Zur Übersicht</a>
+                    <a href="/buchung#live-termin" class="btn btn-primary">Termin buchen</a>
+                    <a href="/buchung" class="btn btn-secondary">Zur Übersicht</a>
                 </div>
             </div>
         </div>
@@ -502,7 +517,8 @@
                     <ul>
                         <li><a href="kreise-kurse.html">Kreise & Kurse</a></li>
 
-                        <li><a href="booking.html">Direkt buchen</a></li>
+                        <li><a href="/fallbeispiele">Fallbeispiele</a></li>
+                        <li><a href="/buchung">Direkt buchen</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
