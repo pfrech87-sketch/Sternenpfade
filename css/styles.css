@@ -5,7 +5,7 @@
 :root {
   /* Brand Colors */
   --c-violet: #2f1155;
-  --c-teal: #016395;
+  --c-teal: #1ea3e3;
   --c-pink: #e23179;
   --c-gold: #fab435;
   --c-white: #ffffff;
@@ -96,10 +96,15 @@ h1 {
 h2 {
   font-size: 2.5rem;
   color: var(--c-gold);
+  text-shadow: 0 0 15px rgba(250, 180, 53, 0.35);
 }
 
 h3 {
   font-size: 1.75rem;
+}
+
+h4 {
+  font-size: 1.3rem;
 }
 
 /* Page Themes */
@@ -107,18 +112,21 @@ h3 {
 .theme-tiere h3,
 .theme-tiere h4 {
   color: var(--c-teal);
+  text-shadow: 0 0 15px rgba(30, 163, 227, 0.35);
 }
 
 .theme-menschen h2,
 .theme-menschen h3,
 .theme-menschen h4 {
   color: var(--c-pink);
+  text-shadow: 0 0 15px rgba(226, 49, 121, 0.35);
 }
 
 .theme-jenseits h2,
 .theme-jenseits h3,
 .theme-jenseits h4 {
   color: var(--c-gold);
+  text-shadow: 0 0 15px rgba(250, 180, 53, 0.35);
 }
 
 p {
@@ -363,6 +371,73 @@ header.scrolled {
   gap: 2rem;
 }
 
+/* Custom Ablauf and Subpoint Grid Layouts */
+.ablauf-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.ablauf-step {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.ablauf-step .step-number {
+  font-size: 2rem;
+  color: var(--c-gold);
+  display: block;
+  margin-bottom: 1rem;
+  font-family: var(--font-heading);
+  transition: text-shadow 0.3s ease;
+}
+
+.theme-tiere .ablauf-step .step-number {
+  color: var(--c-gold); /* keep number gold as styled in html */
+}
+
+@media (min-width: 901px) {
+  .ablauf-step .step-number {
+    min-height: 5.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+}
+
+/* Subpoint Card Styling */
+.subpoint-card {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.subpoint-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.subpoint-card h4 {
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subpoint-card p {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  font-weight: 300;
+  margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -512,6 +587,16 @@ footer {
   .grid-2, .grid-3 {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+
+  .ablauf-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .ablauf-step .step-number {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
   }
 
   .nav-container {

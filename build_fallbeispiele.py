@@ -323,7 +323,6 @@ def build_overview_page(cases):
                             <button class="filter-chip" data-filter="hund">Hund</button>
                             <button class="filter-chip" data-filter="katze">Katze</button>
                             <button class="filter-chip" data-filter="pferd">Pferd</button>
-                            <button class="filter-chip" data-filter="anderes-tier">Andere Tiere</button>
                         </div>
                     </div>
                     <!-- Thema -->
@@ -333,9 +332,7 @@ def build_overview_page(cases):
                             <button class="filter-chip active" data-filter="all">Alle</button>
                             <button class="filter-chip" data-filter="tierkommunikation">Tierkommunikation</button>
                             <button class="filter-chip" data-filter="jenseitskontakt">Jenseitskontakt</button>
-                            <button class="filter-chip" data-filter="trauerbegleitung">Trauerbegleitung</button>
                             <button class="filter-chip" data-filter="verhaltensauffaelligkeiten">Verhaltensauffälligkeiten</button>
-                            <button class="filter-chip" data-filter="mensch-tier-bindung">Mensch-Tier-Bindung</button>
                             <button class="filter-chip" data-filter="energetische-begleitung">Energetische Begleitung</button>
                             <button class="filter-chip" data-filter="tierschutzhund">Tierschutz</button>
                         </div>
