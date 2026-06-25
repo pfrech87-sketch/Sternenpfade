@@ -751,9 +751,8 @@ def build_detail_page(case, all_cases):
 
                     </div>
 
-                    <!-- Right: Sticky Factbox & TOC -->
+                    <!-- Right: Sticky TOC & Image -->
                     <div class="sidebar-content" style="position: sticky; top: 100px;">
-                        {facts_box_html}
                         {toc_html}
                         
                         <div style="border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-glow); height: 260px;">
