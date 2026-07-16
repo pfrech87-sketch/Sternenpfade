@@ -184,6 +184,10 @@ def kreise_kurse_page():
 def datenschutz_page():
     return app.send_static_file('datenschutz.html')
 
+@app.route('/lp/termin')
+def lp_termin_page():
+    return app.send_static_file('lp-termin.html')
+
 @app.route('/fallbeispiele/<slug>')
 def fallbeispiele_detail_page(slug):
     # Sanitize the slug to prevent directory traversal
@@ -243,6 +247,10 @@ def redirect_kreise_kurse():
 @app.route('/datenschutz.html')
 def redirect_datenschutz_html():
     return redirect('/datenschutz', code=301)
+
+@app.route('/lp-termin.html')
+def redirect_lp_termin_html():
+    return redirect('/lp/termin', code=301)
 
 @app.route('/tierkommunikation-detail.html')
 def redirect_tierkommunikation():
