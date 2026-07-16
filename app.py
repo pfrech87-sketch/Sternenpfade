@@ -92,6 +92,12 @@ def serve_admin_pages(filename):
     admin_dir = os.path.join(app.static_folder, 'admin')
     return send_from_directory(admin_dir, filename)
 
+# Disable caching for development
+@app.after_request
+def add_header(response):
+    response.cache_control.no_store = True
+    return response
+
 # --- CLEAN SEO-URL ROUTING ---
 
 @app.route('/dienstleistungen/tierkommunikation')
@@ -101,6 +107,14 @@ def tierkommunikation_page():
 @app.route('/dienstleistungen/jenseits-der-regenbogenbruecke')
 def jenseits_regenbogenbruecke_page():
     return app.send_static_file('jenseitskontakt-tiere-detail.html')
+
+@app.route('/dienstleistungen/schamanische-begleitung-firmen-raeume-gruppen')
+def schamanische_begleitung_firmen_page():
+    return app.send_static_file('schamanische-begleitung-firmen.html')
+
+@app.route('/schamanische-begleitung-firmen')
+def redirect_schamanische_begleitung_firmen():
+    return redirect('/dienstleistungen/schamanische-begleitung-firmen-raeume-gruppen', code=301)
 
 @app.route('/buchung')
 def buchung_page():
@@ -134,6 +148,42 @@ def jenseitskontakt_katze_page():
 def fallbeispiele_page():
     return app.send_static_file('fallbeispiele.html')
 
+@app.route('/tiere')
+def tiere_page():
+    return app.send_static_file('tiere.html')
+
+@app.route('/menschen')
+def menschen_page():
+    return app.send_static_file('menschen.html')
+
+@app.route('/jenseits')
+def jenseits_page():
+    return app.send_static_file('jenseits.html')
+
+@app.route('/about')
+def about_page():
+    return app.send_static_file('about.html')
+
+@app.route('/kontakt')
+def kontakt_page():
+    return app.send_static_file('kontakt.html')
+
+@app.route('/impressum')
+def impressum_page():
+    return app.send_static_file('impressum.html')
+
+@app.route('/agb')
+def agb_page():
+    return app.send_static_file('agb.html')
+
+@app.route('/kreise-kurse')
+def kreise_kurse_page():
+    return app.send_static_file('kreise-kurse.html')
+
+@app.route('/datenschutz')
+def datenschutz_page():
+    return app.send_static_file('datenschutz.html')
+
 @app.route('/fallbeispiele/<slug>')
 def fallbeispiele_detail_page(slug):
     # Sanitize the slug to prevent directory traversal
@@ -153,6 +203,46 @@ def robots_txt():
     return app.send_static_file('robots.txt')
 
 # --- 301 Permanent Redirects for Legacy URLs ---
+
+@app.route('/index.html')
+def redirect_index():
+    return redirect('/', code=301)
+
+@app.route('/tiere.html')
+def redirect_tiere():
+    return redirect('/tiere', code=301)
+
+@app.route('/menschen.html')
+def redirect_menschen():
+    return redirect('/menschen', code=301)
+
+@app.route('/jenseits.html')
+def redirect_jenseits():
+    return redirect('/jenseits', code=301)
+
+@app.route('/about.html')
+def redirect_about():
+    return redirect('/about', code=301)
+
+@app.route('/kontakt.html')
+def redirect_kontakt():
+    return redirect('/kontakt', code=301)
+
+@app.route('/impressum.html')
+def redirect_impressum():
+    return redirect('/impressum', code=301)
+
+@app.route('/agb.html')
+def redirect_agb():
+    return redirect('/agb', code=301)
+
+@app.route('/kreise-kurse.html')
+def redirect_kreise_kurse():
+    return redirect('/kreise-kurse', code=301)
+
+@app.route('/datenschutz.html')
+def redirect_datenschutz_html():
+    return redirect('/datenschutz', code=301)
 
 @app.route('/tierkommunikation-detail.html')
 def redirect_tierkommunikation():
