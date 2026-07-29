@@ -184,6 +184,10 @@ def kreise_kurse_page():
 def datenschutz_page():
     return app.send_static_file('datenschutz.html')
 
+@app.route('/ki-transparenz')
+def ki_transparenz_page():
+    return app.send_static_file('ki-transparenz.html')
+
 @app.route('/lp/termin')
 def lp_termin_page():
     return app.send_static_file('lp-termin.html')
@@ -247,6 +251,10 @@ def redirect_kreise_kurse():
 @app.route('/datenschutz.html')
 def redirect_datenschutz_html():
     return redirect('/datenschutz', code=301)
+
+@app.route('/ki-transparenz.html')
+def redirect_ki_transparenz_html():
+    return redirect('/ki-transparenz', code=301)
 
 @app.route('/lp-termin.html')
 def redirect_lp_termin_html():
