@@ -582,6 +582,27 @@ def contact():
         print(f"Error in contact API: {e}")
         return jsonify({'error': f'Serverfehler beim Verarbeiten der Anfrage: {str(e)}'}), 500
 
+@app.route('/api/preregister', methods=['POST'])
+def preregister():
+    data = request.json
+    if not data:
+        return jsonify({'error': 'Keine Daten übermittelt.'}), 400
+
+    required_fields = ['name', 'email', 'course']
+    for field in required_fields:
+        if field not in data or not str(data[field]).strip():
+            return jsonify({'error': f'Bitte fülle das Pflichtfeld "{field}" aus.'}), 400
+
+    from email_service import send_preregistration_email
+    try:
+        success = send_preregistration_email(data)
+        if success:
+            return jsonify({'success': True, 'message': 'Vielen Dank für deine Voranmeldung! Wir melden uns in Kürze.'}), 200
+        else:
+            return jsonify({'error': 'Fehler beim Senden der E-Mail. Bitte kontaktiere uns direkt via info@sternenpfade.at.'}), 500
+    except Exception as e:
+        print(f"Error in preregister API: {e}")
+        return jsonify({'error': f'Serverfehler beim Verarbeiten der Anfrage: {str(e)}'}), 500
 # --- ADMIN ROUTES ---
 
 

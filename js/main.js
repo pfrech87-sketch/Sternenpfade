@@ -100,6 +100,68 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 4.5. Pre-Registration Form Submission (Voranmeldung)
+    const preRegForm = document.getElementById('preRegForm');
+    const preRegResult = document.getElementById('preRegResult');
+    
+    if(preRegForm && preRegResult) {
+        preRegForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(preRegForm);
+            const object = Object.fromEntries(formData);
+            const json = JSON.stringify(object);
+            
+            preRegResult.style.display = 'block';
+            preRegResult.innerHTML = "Voranmeldung wird gesendet...";
+            preRegResult.style.color = "var(--c-white)";
+            
+            fetch('/api/preregister', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: json
+            })
+            .then(async (response) => {
+                let json = await response.json();
+                if (response.status == 200 || response.status == 201) {
+                    preRegResult.innerHTML = json.message || "Vielen Dank für deine Voranmeldung! Ich melde mich in Kürze bei dir.";
+                    preRegResult.style.background = "linear-gradient(135deg, var(--c-teal), var(--c-violet))";
+                    preRegResult.style.color = "var(--c-white)";
+                    preRegResult.style.padding = "12px 20px";
+                    preRegResult.style.borderRadius = "8px";
+                    preRegResult.style.boxShadow = "0 0 15px rgba(255, 255, 255, 0.4)";
+                    preRegResult.style.border = "1px solid rgba(255, 255, 255, 0.2)";
+                    preRegResult.style.textAlign = "center";
+                    preRegResult.style.display = "block";
+                } else {
+                    console.log(response);
+                    preRegResult.innerHTML = json.error || json.message || "Etwas ist schief gelaufen.";
+                    preRegResult.style.color = "var(--c-pink)";
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                preRegResult.innerHTML = "Fehler beim Senden der Voranmeldung. Bitte versuche es später noch einmal.";
+                preRegResult.style.color = "var(--c-pink)";
+            })
+            .then(function() {
+                preRegForm.reset();
+                setTimeout(() => {
+                    preRegResult.style.display = 'none';
+                    preRegResult.style.background = '';
+                    preRegResult.style.color = '';
+                    preRegResult.style.padding = '';
+                    preRegResult.style.borderRadius = '';
+                    preRegResult.style.boxShadow = '';
+                    preRegResult.style.border = '';
+                    preRegResult.style.textAlign = '';
+                }, 8000);
+            });
+        });
+    }
+
     // 5. FAQ Accordion Logic
     document.querySelectorAll('.faq-question').forEach(button => {
         button.addEventListener('click', () => {
