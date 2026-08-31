@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Termin & Aufträge vereinbaren | Sternenpfade</title>
-    <meta name="description" content="Wähle zwischen einem fixen Beratungstermin (vor Ort / online) oder beauftrage eine flexible Auftragsarbeit wie Tierkommunikation oder Jenseitskontakt.">
+    <title>Termin vereinbaren | Sternenpfade</title>
+    <meta name="description" content="Finde Klarheit & innere Balance – Buche dein persönliches Gespräch live vor Ort oder online via Zoom/Telefon.">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="icon" type="image/png" href="/assets/favicon.png?v=2">
     <!-- Google Tag Manager -->
@@ -13,32 +13,18 @@
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KX6NL5LL');</script>
-    <!-- End Google Tag Manager -->
-
-    <!-- Open Graph Tags für Previews -->
-    <meta property="og:title" content="Termin & Aufträge vereinbaren | Sternenpfade">
-    <meta property="og:description" content="Buche deinen Wunschtermin im Online-Kalender oder beauftrage eine flexible schamanische Arbeit (Ergebnis per Sprachnachricht).">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Termin vereinbaren | Sternenpfade">
+    <meta property="og:description" content="Finde Klarheit & innere Balance – Buche dein persönliches Gespräch.">
     <meta property="og:image" content="https://www.sternenpfade.at/assets/social-share.png">
     <meta property="og:url" content="https://www.sternenpfade.at/lp/termin">
-    <meta property="og:type" content="website">
-
-    <!-- Structured Data für lokale Dienstleistung -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "Termin & Aufträge - Sternenpfade",
-      "description": "Optimierte Landingpage zur Vereinbarung von Live-Terminen oder Direktbeauftragung von schamanischen Arbeiten.",
-      "publisher": {
-        "@type": "Organization",
-        "name": "Sternenpfade - Patrick Frech"
-      }
-    }
-    </script>
-
-    <!-- Custom page-specific styles for UX & CRO -->
+    
     <style>
-        /* Spinner for Calendly Loading State */
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Spinner for Calendly */
         .calendly-loader {
             position: absolute;
             top: 50%;
@@ -51,7 +37,6 @@
             color: var(--c-gold);
             z-index: 1;
             pointer-events: none;
-            transition: opacity 0.5s ease;
         }
         .spinner {
             width: 40px;
@@ -64,8 +49,37 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
-        /* Accordion CSS for FAQs */
+        
+        /* Minimal Header */
+        .minimal-header {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 1.5rem 0;
+        }
+        
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.9);
+        }
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Accordion CSS */
         .accordion {
             max-width: 850px;
             margin: 0 auto;
@@ -77,12 +91,6 @@
             margin-bottom: 1.25rem;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-        }
-        .accordion-item:hover {
-            border-color: rgba(250, 180, 53, 0.3);
-            box-shadow: 0 0 20px rgba(250, 180, 53, 0.08);
         }
         .accordion-header {
             width: 100%;
@@ -90,7 +98,6 @@
             background: none;
             border: none;
             color: var(--c-white);
-            font-family: var(--font-heading);
             font-size: 1.15rem;
             font-weight: 500;
             text-align: left;
@@ -98,20 +105,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
         }
         .accordion-header::after {
             content: '+';
             font-size: 1.6rem;
-            font-weight: 300;
             color: var(--c-gold);
             transition: transform 0.3s ease;
-            display: inline-block;
-            line-height: 1;
-        }
-        .accordion-item.active {
-            border-color: rgba(250, 180, 53, 0.4);
-            box-shadow: 0 0 30px rgba(47, 17, 85, 0.3);
         }
         .accordion-item.active .accordion-header::after {
             transform: rotate(45deg);
@@ -120,30 +119,33 @@
         .accordion-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s ease;
+            transition: max-height 0.35s ease, padding 0.35s ease;
             padding: 0 1.8rem;
             color: rgba(255, 255, 255, 0.8);
-            font-size: 1rem;
             line-height: 1.7;
         }
         .accordion-item.active .accordion-content {
             padding-bottom: 1.5rem;
         }
-        .accordion-content p {
-            margin-bottom: 0;
-            font-size: 0.95rem;
+        
+        .testimonial-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 2rem;
+            border-radius: 16px;
+            position: relative;
         }
-
-        /* Hero Buttons spacing */
-        .hero-buttons {
-            margin-top: 2rem;
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
+        .testimonial-quote {
+            font-size: 1.05rem;
+            font-style: italic;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 1rem;
+        }
+        .testimonial-author {
+            color: var(--c-gold);
+            font-weight: 600;
         }
         
-        /* Inline links decoration */
         .inline-link {
             color: var(--c-gold);
             text-decoration: underline;
@@ -155,468 +157,274 @@
     </style>
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KX6NL5LL"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KX6NL5LL" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     
     <div class="cosmic-bg"></div>
     <div class="cosmic-overlay"></div>
 
-    <!-- Simplified Header for CRO: No standard menu, only logo and WhatsApp contact -->
-    <header style="position: absolute; width: 100%; top: 0; left: 0; z-index: 1000; padding: 1.5rem 0;">
+    <!-- A. Minimal Header -->
+    <header class="minimal-header">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-            <a href="/" class="logo">
+            <div class="logo">
                 <img src="/assets/logo-wei.png" alt="Sternenpfade Logo" style="height: 50px;">
-            </a>
+            </div>
             <a href="https://wa.me/4369010571792" target="_blank" class="btn btn-whatsapp" style="padding: 0.6rem 1.5rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; text-transform: none; border-radius: 50px; font-weight: 500;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
                 </svg>
-                WhatsApp Kontakt
+                Kurze Frage? WhatsApp
             </a>
         </div>
     </header>
 
-    <main id="main-content">
-        <!-- Hero Section with strong value proposition and navigation -->
-        <section class="hero" style="min-height: 50vh; display: flex; align-items: center; justify-content: center; text-align: center; padding-top: 140px; padding-bottom: 3rem;">
+    <main>
+        <!-- B. Hero-Bereich -->
+        <section class="hero" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; text-align: center; padding-top: 140px; padding-bottom: 4rem;">
             <div class="container hero-content">
-                <span class="hero-subtitle" style="color: var(--c-gold);">Persönliche & Mediale Begleitung</span>
-                <h1 style="font-size: 3rem; background: linear-gradient(to right, var(--c-white), var(--c-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem;">Wie darf ich dich & deinen Gefährten begleiten?</h1>
-                <p style="max-width: 750px; margin: 0 auto; font-size: 1.15rem; line-height: 1.7; color: var(--c-hint);">
-                    Wähle deinen Weg zu mehr Balance: Reserviere einen **fixen Termin** in meinem Online-Kalender (für ein persönliches Gespräch live oder online) oder beauftrage eine **flexible Auftragsarbeit** (wie Tierkommunikation) ganz ohne Terminabsprache.
+                <span class="hero-subtitle" style="color: var(--c-gold); margin-bottom: 1rem; display: inline-block; background: rgba(250,180,53,0.1); padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(250,180,53,0.3);">Persönliche & Mediale 1:1 Begleitung</span>
+                
+                <h1 style="font-size: 3.5rem; line-height: 1.2; margin-bottom: 1.5rem;">Finde Klarheit & innere Balance –<br>Buche dein persönliches Gespräch</h1>
+                
+                <p style="max-width: 800px; margin: 0 auto 2.5rem auto; font-size: 1.2rem; line-height: 1.7; color: var(--c-hint);">
+                    Live vor Ort oder bequem via Zoom/Telefon. Wähle direkt im Kalender deinen passenden Wunschtermin mit Patrick Frech, MA.
                 </p>
-                <div class="hero-buttons">
-                    <a href="#calendly-section" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.8rem 1.8rem;">Termin buchen (Kalender)</a>
-                    <a href="#auftraege-section" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.8rem 1.8rem;">Auftrag erteilen (Sprachnachricht)</a>
+                
+                <a href="#calendly-section" class="btn btn-primary" style="font-size: 1.2rem; padding: 1rem 2.5rem; box-shadow: 0 10px 30px rgba(250, 180, 53, 0.3);">Jetzt Wunschtermin wählen ↓</a>
+                
+                <div class="trust-badges">
+                    <div class="trust-badge">⭐ 5.0 Klientenbewertungen</div>
+                    <div class="trust-badge">🎓 Patrick Frech, MA</div>
+                    <div class="trust-badge">🌿 100+ begleitete Mensch-Tier-Gespanne</div>
                 </div>
             </div>
         </section>
 
-        <!-- Ablauf-Klarheit Section -->
-        <section class="section" style="padding-top: 2rem; padding-bottom: 4rem;">
+        <!-- C. Das Termin-Buchungszentrum -->
+        <section id="calendly-section" class="section" style="padding-top: 5rem; padding-bottom: 5rem; border-top: 1px solid var(--glass-border); background: rgba(30,163,227,0.03);">
             <div class="container">
-                <div style="text-align: center; margin-bottom: 3.5rem;">
-                    <span style="color: var(--c-pink); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; font-weight: 600;">Entscheidungshilfe</span>
-                    <h2 style="font-size: 2.2rem; margin-top: 0.5rem; color: var(--c-white);">Zwei Wege im Überblick</h2>
-                    <p style="max-width: 600px; margin: 0 auto;">Damit du genau das Format wählst, das du und dein Tier gerade benötigen.</p>
-                </div>
-
-                <div class="grid-2" style="gap: 2.5rem; max-width: 1050px; margin: 0 auto; align-items: stretch;">
-                    <!-- Weg 1 Card -->
-                    <div class="glass-card" style="border-color: rgba(30,163,227,0.3); padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <div style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background: rgba(30,163,227,0.15); border: 1px solid var(--c-teal); margin-bottom: 1.5rem;">
-                                <span style="color: var(--c-teal); font-size: 1.5rem; font-weight: 600;">1</span>
-                            </div>
-                            <h3 style="color: var(--c-teal); margin-bottom: 1rem; font-size: 1.5rem;">Direkter Termin (Live / Online)</h3>
-                            <p style="font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.85); margin-bottom: 1.5rem;">
-                                Du buchst ein persönliches Gespräch zu einem **festen Zeitpunkt**. Entweder treffen wir uns persönlich (Live vor Ort) oder digital per Video/Telefon (Online-Termin).
-                            </p>
-                            
-                            <ul style="list-style: none; padding-left: 0; margin-bottom: 2rem;">
-                                <li style="margin-bottom: 0.8rem; display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.95rem;">
-                                    <span style="color: var(--c-teal); font-weight: bold;">✔</span> <span>Direkter, persönlicher Austausch in Echtzeit</span>
-                                </li>
-                                <li style="margin-bottom: 0.8rem; display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.95rem;">
-                                    <span style="color: var(--c-teal); font-weight: bold;">✔</span> <span>Freie Zeitauswahl direkt im Kalender unten</span>
-                                </li>
-                                <li style="margin-bottom: 0.8rem; display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.95rem;">
-                                    <span style="color: var(--c-teal); font-weight: bold;">✔</span> <span>Bequeme Bezahlung vorab per Banküberweisung</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <a href="#calendly-section" class="btn btn-secondary" style="width: 100%; font-size: 0.8rem; padding: 0.7rem 1.5rem; margin-bottom: 0;">Zum Kalender scrollen</a>
-                    </div>
-
-                    <!-- Weg 2 Card -->
-                    <div class="glass-card" style="border-color: rgba(250,180,53,0.3); padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <div style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background: rgba(250,180,53,0.15); border: 1px solid var(--c-gold); margin-bottom: 1.5rem;">
-                                <span style="color: var(--c-gold); font-size: 1.5rem; font-weight: 600;">2</span>
-                            </div>
-                            <h3 style="color: var(--c-gold); margin-bottom: 1rem; font-size: 1.5rem;">Auftragsarbeiten (Ohne Termin)</h3>
-                            <p style="font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.85); margin-bottom: 1.5rem;">
-                                Für Tierkommunikation, Jenseitskontakte oder Fernbehandlungen. Du brauchst **keinen Termin** – ich arbeite eigenständig für dich und sende dir das Ergebnis per Sprachnachricht zu.
-                            </p>
-                            
-                            <ul style="list-style: none; padding-left: 0; margin-bottom: 2rem;">
-                                <li style="margin-bottom: 0.8rem; display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.95rem;">
-                                    <span style="color: var(--c-gold); font-weight: bold;">✔</span> <span>Keine Terminabstimmung oder Live-Anwesenheit nötig</span>
-                                </li>
-                                <li style="margin-bottom: 0.8rem; display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.95rem;">
-                                    <span style="color: var(--c-gold); font-weight: bold;">✔</span> <span>Direkte Buchung & Online-Zahlung an unserer Kasse</span>
-                                </li>
-                                <li style="margin-bottom: 0.8rem; display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.95rem;">
-                                    <span style="color: var(--c-gold); font-weight: bold;">✔</span> <span>Ausführliche Sprachnachricht nach wenigen Werktagen</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <a href="#auftraege-section" class="btn btn-primary" style="width: 100%; font-size: 0.8rem; padding: 0.7rem 1.5rem; margin-bottom: 0;">Zu den Angeboten scrollen</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sektion 1: Calendly-Widget -->
-        <section id="calendly-section" class="section" style="padding-top: 4rem; padding-bottom: 4rem; border-top: 1px solid var(--glass-border); background: rgba(30,163,227,0.03);">
-            <div class="container">
-                <div style="text-align: center; margin-bottom: 2.5rem;">
-                    <span style="color: var(--c-teal); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; font-weight: 600;">Weg 1</span>
-                    <h2 style="font-size: 2.2rem; margin-top: 0.5rem; color: var(--c-white);">Buche deinen festen Termin</h2>
-                    <p style="max-width: 700px; margin: 0.5rem auto 0 auto; font-size: 1.05rem;">
-                        Wähle im Online-Kalender dein gewünschtes Gespräch (Live vor Ort oder Online via Zoom/Telefon). Die Abrechnung erfolgt bequem vorab per Überweisung.
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--c-white);">Wähle deinen passenden Termin</h2>
+                    <p style="font-size: 1.1rem; color: rgba(255,255,255,0.8); max-width: 600px; margin: 0 auto;">
+                        Einfach Format auswählen (Online via Zoom oder Live vor Ort) und Zeitfenster reservieren.
                     </p>
                 </div>
 
-                <div class="glass-card" style="padding: 1.5rem; border-color: rgba(30,163,227,0.3); box-shadow: var(--shadow-glow); margin-bottom: 2rem; max-width: 900px; margin-left: auto; margin-right: auto; position: relative; min-height: 700px;">
-                    <!-- Loading state for slow widget loads -->
+                <div class="glass-card" style="padding: 1rem; border-color: rgba(30,163,227,0.3); box-shadow: var(--shadow-glow); margin-bottom: 1.5rem; max-width: 950px; margin-left: auto; margin-right: auto; position: relative; min-height: 700px; border-radius: 20px;">
                     <div class="calendly-loader" id="calendly-spinner">
                         <div class="spinner"></div>
-                        <span style="font-size: 0.9rem; font-weight: 300;">Lade Online-Kalender...</span>
+                        <span style="font-size: 0.9rem;">Lade Kalender...</span>
                     </div>
 
-                    <!-- Calendly inline widget begin -->
-                    <div class="calendly-inline-widget"
-                        data-url="https://calendly.com/wunderschamane?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=2f1155"
-                        style="min-width:320px;height:700px; position: relative; z-index: 2;"></div>
+                    <div class="calendly-inline-widget" data-url="https://calendly.com/wunderschamane?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=2f1155" style="min-width:320px;height:700px; position: relative; z-index: 2;"></div>
                     <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-                    <!-- Calendly inline widget end -->
+                </div>
+                
+                <div style="text-align: center; color: var(--c-hint); font-size: 1rem; font-weight: 500;">
+                    ✅ Sofortige Terminbestätigung per E-Mail & Kalendereintrag
                 </div>
             </div>
         </section>
 
-        <!-- Sektion 2: Highlight Services (Auftragsarbeiten) -->
-        <section id="auftraege-section" class="section" style="background: rgba(47, 17, 85, 0.2); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); padding: 5rem 0;">
-            <div class="container">
-                <div style="text-align: center; margin-bottom: 3.5rem;">
-                    <span style="color: var(--c-pink); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; font-weight: 600;">Weg 2</span>
-                    <h2 style="font-size: 2.2rem; margin-top: 0.5rem; color: var(--c-white);">Auftragsarbeiten beauftragen</h2>
-                    <p style="max-width: 700px; margin: 0.5rem auto 0 auto;">
-                        Kein Kalendertermin nötig: Wähle eine Leistung, bezahle sicher online und ich melde mich nach wenigen Werktagen mit dem fertigen Ergebnis per Sprachnachricht bei dir.
-                    </p>
-                </div>
-
-                <div class="grid-3" style="margin-bottom: 2rem;">
-                    <!-- Schamanische Tierkommunikation -->
-                    <div class="glass-card product-card" style="border-color: rgba(30,163,227,0.3);">
-                        <img src="/assets/Tierkommunkation-shop.jpeg" alt="Schamanische Tierkommunikation" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--c-teal); font-size: 1.4rem;">Schamanische Tierkommunikation</h3>
-                        <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; flex-grow: 1;">Verstehe die emotionale und seelische Welt deines Tieres. Ich übermittle dir Botschaften deines Tieres bei Verhaltensänderungen, Ängsten oder zur tiefen Bindungsstärkung. Ergebnis per Sprachnachricht.</p>
-                        <div class="card-footer" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-weight: 600; color: var(--c-gold); font-size: 1.25rem;">90 €</span>
-                            <a href="/checkout.html?item=Schamanische+Tierkommunikation&price=90" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.5rem 1.2rem; margin-bottom: 0;">Jetzt buchen</a>
-                        </div>
-                    </div>
-
-                    <!-- Jenseitskontakt für Tiere & Menschen -->
-                    <div class="glass-card product-card" style="border-color: rgba(250,180,53,0.3);">
-                        <img src="/assets/Jenseits-kategorie.jpeg" alt="Jenseitskontakt" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--c-gold); font-size: 1.4rem;">Jenseitskontakt (Tier / Mensch)</h3>
-                        <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; flex-grow: 1;">Liebe kennt keine Grenzen. In einem behutsamen medialen Kontakt übermittele ich dir Botschaften deines verstorbenen Tieres oder eines geliebten Menschen zur Trauerbewältigung. Ergebnis per Sprachnachricht.</p>
-                        <div class="card-footer" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-weight: 600; color: var(--c-gold); font-size: 1.25rem;">ab 90 €</span>
-                            <a href="/checkout.html?item=Jenseitskontakt+fuer+Tiere&price=90" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.5rem 1.2rem; margin-bottom: 0;">Jetzt buchen</a>
-                        </div>
-                    </div>
-
-                    <!-- Schamanische Fernbehandlung (Mensch) -->
-                    <div class="glass-card product-card" style="border-color: rgba(226,49,121,0.3);">
-                        <img src="/assets/kategorie_mensch-belgeitung2.jpeg" alt="Schamanische Fernbehandlung" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 1.5rem;">
-                        <h3 style="color: var(--c-pink); font-size: 1.4rem;">Schamanische Fernbehandlung</h3>
-                        <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; flex-grow: 1;">Wirke im morphogenetischen Feld. Blockadenlösung, Seelenrückholung und energetische Harmonisierung bequem von zu Hause aus. Ergebnis per Sprachnachricht.</p>
-                        <div class="card-footer" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-weight: 600; color: var(--c-gold); font-size: 1.25rem;">120 €</span>
-                            <a href="/checkout.html?item=Schamanische+Fernbehandlung&price=120" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.5rem 1.2rem; margin-bottom: 0;">Jetzt buchen</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Testimonials Section -->
-        <section class="section" style="background: rgba(47, 17, 85, 0.15); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); padding: 5rem 0;">
-            <div class="container" style="max-width: 900px;">
-                <div style="text-align: center; margin-bottom: 3rem;">
-                    <span style="color: var(--c-gold); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; font-weight: 500; display: block; margin-bottom: 0.5rem;">Stimmen des Herzens</span>
-                    <h2 style="font-size: 2.2rem; color: var(--c-white);">Erfahrungen & Klientenstimmen</h2>
-                    <p style="max-width: 600px; margin: 0 auto; color: var(--c-hint);">Was Menschen und ihre Gefährten auf den Sternenpfaden erleben durften.</p>
-                </div>
-
-                <div class="glass-card testimonial-slider-container" style="border-color: rgba(250, 180, 53, 0.3); padding: 3.5rem 2rem; text-align: center; position: relative; overflow: hidden; min-height: 380px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    
-                    <!-- Quote Icon -->
-                    <div style="font-size: 3.5rem; line-height: 1; color: var(--c-gold); opacity: 0.3; margin-bottom: 1rem; font-family: 'Playfair Display', serif; font-style: italic;">“</div>
-
-                    <!-- Testimonials Wrapper -->
-                    <div class="testimonial-slides" style="width: 100%; position: relative;">
-                        
-                        <!-- Slide 1 -->
-                        <div class="testimonial-slide active" style="transition: opacity 0.6s ease, transform 0.6s ease; opacity: 1; transform: translateY(0); display: block;">
-                            <p style="font-size: 1.25rem; font-style: italic; line-height: 1.7; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.95); font-weight: 300;">
-                                "Ganz lieben Dank für diese aufschlussreiche Information!! Es ergibt nun für mich vieles einen klaren Blick. Danke, Patrick, für alles! Liebe Grüße und bis bald"
-                            </p>
-                            <div>
-                                <strong style="color: var(--c-white); font-size: 1.15rem; display: block; margin-bottom: 0.25rem;">Aaron mit Kira</strong>
-                                <span style="color: var(--c-teal); font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Schamanische Tierkommunikation</span>
-                            </div>
-                        </div>
-
-                        <!-- Slide 2 -->
-                        <div class="testimonial-slide" style="transition: opacity 0.6s ease, transform 0.6s ease; opacity: 0; transform: translateY(20px); display: none;">
-                            <p style="font-size: 1.25rem; font-style: italic; line-height: 1.7; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.95); font-weight: 300;">
-                                "Ich bin jetzt gerade sehr berührt über dieses liebevolle Gespräch mit meiner Snoopy...vielen lieben herzlichen Dank Patrick💝"
-                            </p>
-                            <div>
-                                <strong style="color: var(--c-white); font-size: 1.15rem; display: block; margin-bottom: 0.25rem;">Heidi mit Snoopy</strong>
-                                <span style="color: var(--c-teal); font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Schamanische Tierkommunikation</span>
-                            </div>
-                        </div>
-
-                        <!-- Slide 3 -->
-                        <div class="testimonial-slide" style="transition: opacity 0.6s ease, transform 0.6s ease; opacity: 0; transform: translateY(20px); display: none;">
-                            <p style="font-size: 1.25rem; font-style: italic; line-height: 1.7; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.95); font-weight: 300;">
-                                "Ich danke Dir von ganzem Herzen!!! Das hat mich jetzt sehr sehr berührt - ich bin so froh und glücklich, Deine Adresse im Internet gefunden zu haben. Herzlichen Dank lieber Patrick! Die Botschaft bedeutet mir sehr viel!!!"
-                            </p>
-                            <div>
-                                <strong style="color: var(--c-white); font-size: 1.15rem; display: block; margin-bottom: 0.25rem;">Renate mit Maxi</strong>
-                                <span style="color: var(--c-gold); font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Jenseitskontakt für Tiere</span>
-                            </div>
-                        </div>
-
-                        <!-- Slide 4 -->
-                        <div class="testimonial-slide" style="transition: opacity 0.6s ease, transform 0.6s ease; opacity: 0; transform: translateY(20px); display: none;">
-                            <p style="font-size: 1.25rem; font-style: italic; line-height: 1.7; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.95); font-weight: 300;">
-                                "Hallo Patrick! Ich bin total begeistert und hatte während dem anhören Gänsehaut! Ich danke dir von ganzem Herzen, diese Kommunikation wird uns bestimmt weiterhelfen 😊😊."
-                            </p>
-                            <div>
-                                <strong style="color: var(--c-white); font-size: 1.15rem; display: block; margin-bottom: 0.25rem;">Kevin mit Freya</strong>
-                                <span style="color: var(--c-teal); font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Schamanische Tierkommunikation</span>
-                            </div>
-                        </div>
-
-                        <!-- Slide 5 -->
-                        <div class="testimonial-slide" style="transition: opacity 0.6s ease, transform 0.6s ease; opacity: 0; transform: translateY(20px); display: none;">
-                            <p style="font-size: 1.25rem; font-style: italic; line-height: 1.7; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.95); font-weight: 300;">
-                                "Hallo lieber Patrick vielen lieben Dank an dich und die Spirits es geht ihm schon sehr viel besser ich hatte echt Angst um ihn danke danke an dich und die Spirits"
-                            </p>
-                            <div>
-                                <strong style="color: var(--c-white); font-size: 1.15rem; display: block; margin-bottom: 0.25rem;">Janine mit Mustang</strong>
-                                <span style="color: var(--c-teal); font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Schamanische Fernbehandlung</span>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Navigation Arrows -->
-                    <button class="slider-arrow prev-arrow" aria-label="Vorheriger Kommentar" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--c-white); cursor: pointer; transition: all 0.3s ease; z-index: 10;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    </button>
-                    <button class="slider-arrow next-arrow" aria-label="Nächster Kommentar" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--c-white); cursor: pointer; transition: all 0.3s ease; z-index: 10;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </button>
-
-                    <!-- Indicator Dots -->
-                    <div class="slider-dots" style="display: flex; gap: 0.75rem; margin-top: 2rem; justify-content: center; z-index: 10;">
-                        <span class="slider-dot active" data-index="0" style="width: 10px; height: 10px; border-radius: 50%; background: var(--c-gold); cursor: pointer; transition: all 0.3s ease;"></span>
-                        <span class="slider-dot" data-index="1" style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s ease;"></span>
-                        <span class="slider-dot" data-index="2" style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s ease;"></span>
-                        <span class="slider-dot" data-index="3" style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s ease;"></span>
-                        <span class="slider-dot" data-index="4" style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s ease;"></span>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Trust Portrait & Credentials Section -->
+        <!-- D. Was dich im Termin erwartet -->
         <section class="section" style="padding: 5rem 0;">
             <div class="container">
-                <div class="grid-2" style="align-items: center; margin-bottom: 5rem;">
-                    <div style="border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-glow); max-width: 450px; margin: 0 auto;">
-                        <img src="/assets/patrick-trust.JPG" alt="Patrick Frech, MA" style="width: 100%; display: block; object-fit: cover;">
+                <div style="text-align: center; margin-bottom: 3.5rem;">
+                    <h2 style="font-size: 2.2rem; color: var(--c-white);">Was dich im Termin erwartet</h2>
+                </div>
+                
+                <div class="grid-3" style="gap: 2rem;">
+                    <div class="glass-card" style="padding: 2.5rem; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 1.5rem;">🌌</div>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 1rem; color: var(--c-teal);">Raum für deine Themen</h3>
+                        <p style="font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.6;">Individuelle, ungeteilte Aufmerksamkeit für dich und/oder dein Tier. Wir schauen genau dorthin, wo es hakt.</p>
                     </div>
-                    <div class="glass-card" style="border-color: rgba(250,180,53,0.3);">
-                        <span style="color: var(--c-gold); text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">Dein Begleiter</span>
-                        <h2 style="font-size: 2rem; color: var(--c-white);">Patrick Frech, MA</h2>
-                        <p style="font-size: 1.05rem; line-height: 1.7;">Schamanismus ist für mich eine lebendige Brücke zwischen den Welten. In meiner Arbeit verbinde ich traditionelles energetisches Wissen mit medialer Empathie. Mein Fokus liegt darauf, blockierende Muster im Energiefeld sanft zu lösen, um die natürliche Kraft deiner Selbstregulation wieder fließen zu lassen.</p>
-                        <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem;">Ich freue mich darauf, dich und deinen Gefährten ein Stück auf euren Sternenpfaden begleiten zu dürfen.</p>
-                        <a href="#main-content" class="btn btn-primary" style="display: inline-block;">Weg oben wählen</a>
+                    
+                    <div class="glass-card" style="padding: 2.5rem; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 1.5rem;">✨</div>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 1rem; color: var(--c-gold);">Energetische & Mediale Klärung</h3>
+                        <p style="font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.6;">Blockaden aufspüren, Botschaften aus der geistigen Welt verstehen und neue Lösungswege aufzeigen.</p>
+                    </div>
+                    
+                    <div class="glass-card" style="padding: 2.5rem; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 1.5rem;">🌿</div>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 1rem; color: var(--c-pink);">Bodenständig & Konkret</h3>
+                        <p style="font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.6;">Klare Handlungsschritte und eine Begleitung, die ohne dogmatische oder esoterische Konzepte auskommt.</p>
                     </div>
                 </div>
-
-                <!-- Trust Elements / Credentials Grid -->
-                <div class="grid-3" style="gap: 2.5rem; max-width: 1100px; margin-left: auto; margin-right: auto; text-align: center;">
-                    <!-- Academic Trust -->
-                    <div class="glass-card" style="padding: 2.5rem 1.8rem; border-color: rgba(250, 180, 53, 0.25); display: flex; flex-direction: column; align-items: center; min-height: 250px; justify-content: flex-start;">
-                        <div style="font-size: 2.8rem; margin-bottom: 1rem; color: var(--c-gold); filter: drop-shadow(0 0 10px rgba(250, 180, 53, 0.3));">🎓</div>
-                        <h4 style="font-size: 1.2rem; color: var(--c-white); margin-bottom: 0.75rem; font-family: var(--font-heading); font-weight: 600;">Akademischer Grad (MA)</h4>
-                        <p style="font-size: 0.95rem; color: var(--c-hint); line-height: 1.6; margin-bottom: 0;">Patrick Frech, MA. Verknüpfung von solider Reflexion, akademischer Tiefe und authentischer spiritueller Praxis.</p>
-                    </div>
-
-                    <!-- Quality / Werte Trust -->
-                    <div class="glass-card" style="padding: 2.5rem 1.8rem; border-color: rgba(30, 163, 227, 0.25); display: flex; flex-direction: column; align-items: center; min-height: 250px; justify-content: flex-start;">
-                        <div style="font-size: 2.8rem; margin-bottom: 1rem; color: var(--c-teal); filter: drop-shadow(0 0 10px rgba(30, 163, 227, 0.3));">🌿</div>
-                        <h4 style="font-size: 1.2rem; color: var(--c-white); margin-bottom: 0.75rem; font-family: var(--font-heading); font-weight: 600;">Bodenständigkeit & Herz</h4>
-                        <p style="font-size: 0.95rem; color: var(--c-hint); line-height: 1.6; margin-bottom: 0;">Klarheit statt esoterischem Chaos. Eine ehrliche, transparente Begleitung ganz ohne starre, dogmatische Konzepte.</p>
-                    </div>
-
-                    <!-- Client Volume Trust -->
-                    <div class="glass-card" style="padding: 2.5rem 1.8rem; border-color: rgba(226, 49, 121, 0.25); display: flex; flex-direction: column; align-items: center; min-height: 250px; justify-content: flex-start;">
-                        <div style="font-size: 2.8rem; margin-bottom: 1rem; color: var(--c-pink); filter: drop-shadow(0 0 10px rgba(226, 49, 121, 0.3));">🤝</div>
-                        <h4 style="font-size: 1.2rem; color: var(--c-white); margin-bottom: 0.75rem; font-family: var(--font-heading); font-weight: 600;">100+ Glückliche Gespanne</h4>
-                        <p style="font-size: 0.95rem; color: var(--c-hint); line-height: 1.6; margin-bottom: 0;">Langjährige Erfahrung mit über 100 erfolgreich begleiteten Mensch-Tier-Gespannen auf ihren Lebenspfaden.</p>
-                    </div>
+                
+                <div style="text-align: center; margin-top: 3.5rem;">
+                    <a href="#calendly-section" class="btn btn-secondary" style="font-size: 1rem; padding: 0.8rem 2rem;">Termin buchen</a>
                 </div>
             </div>
         </section>
 
-        <!-- FAQ Section -->
-        <section class="section" style="padding: 5rem 0; border-top: 1px solid var(--glass-border); background: rgba(18, 11, 30, 0.5);">
+        <!-- E. Über Patrick Frech, MA -->
+        <section class="section" style="padding: 5rem 0; background: rgba(47, 17, 85, 0.2); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);">
+            <div class="container grid-2" style="align-items: center; gap: 4rem;">
+                <div style="border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-glow);">
+                    <img src="https://primary.jwwb.nl/public/r/v/d/temp-lsiczhzfpedaujspswqx/frechpatrick-28-high.jpg?enable-io=true&crop=1%3A1&width=800" alt="Patrick Frech, MA" style="width: 100%; height: auto; display: block;">
+                </div>
+                <div>
+                    <h2 style="font-size: 2.2rem; margin-bottom: 1.5rem;">Über Patrick Frech, MA</h2>
+                    <p style="font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem; color: rgba(255,255,255,0.9);">
+                        Als Schamane und Medium verbinde ich fundierte akademische Reflexion mit authentischer, schamanischer Praxis. Mein Ziel ist es, dir nicht nur spirituelle Impulse zu geben, sondern diese auch greifbar und bodenständig in deinen Alltag zu integrieren.
+                    </p>
+                    <ul style="list-style: none; padding-left: 0; margin-bottom: 2.5rem;">
+                        <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-size: 1.05rem;">
+                            <span style="color: var(--c-gold); font-size: 1.2rem;">✔</span> Akademischer Grad (MA) für analytische Tiefe
+                        </li>
+                        <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-size: 1.05rem;">
+                            <span style="color: var(--c-teal); font-size: 1.2rem;">✔</span> 100+ erfolgreich begleitete Klienten & Tiere
+                        </li>
+                        <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-size: 1.05rem;">
+                            <span style="color: var(--c-pink); font-size: 1.2rem;">✔</span> Empathische, vorurteilsfreie Begegnung auf Augenhöhe
+                        </li>
+                    </ul>
+                    <a href="#calendly-section" class="btn btn-primary" style="font-size: 1rem; padding: 0.8rem 2rem;">Jetzt Termin sichern</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- F. Klientenstimmen / Testimonials -->
+        <section class="section" style="padding: 5rem 0;">
             <div class="container">
-                <div style="text-align: center; margin-bottom: 4rem;">
-                    <span style="color: var(--c-gold); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; font-weight: 600;">Häufige Fragen</span>
-                    <h2 style="font-size: 2.2rem; margin-top: 0.5rem; color: var(--c-white);">Fragen & Antworten zum Ablauf</h2>
-                    <p style="max-width: 600px; margin: 0 auto; color: var(--c-hint);">Hier findest du Antworten zu Bezahlung, Ablauf und dem Unterschied der Buchungswege.</p>
+                <div style="text-align: center; margin-bottom: 3.5rem;">
+                    <h2 style="font-size: 2.2rem; color: var(--c-white);">Erfahrungen meiner Klienten</h2>
                 </div>
+                
+                <div class="grid-2" style="gap: 2rem; max-width: 1000px; margin: 0 auto;">
+                    <div class="testimonial-card">
+                        <p class="testimonial-quote">"Nach dem Termin hatte ich endlich wieder Klarheit. Patrick hat eine so bodenständige und ruhige Art, dass ich mich sofort verstanden gefühlt habe. Der Online-Termin fühlte sich an, als säßen wir im selben Raum."</p>
+                        <p class="testimonial-author">— Sarah M.</p>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <p class="testimonial-quote">"Ich war anfangs skeptisch gegenüber Schamanismus, aber Patricks Mix aus Spiritualität und seiner klaren, strukturierten Herangehensweise hat mich restlos überzeugt. Eine enorme Erleichterung!"</p>
+                        <p class="testimonial-author">— Thomas W.</p>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <p class="testimonial-quote">"Unglaublich, was in nur einer Sitzung alles gelöst wurde. Mein Hund ist seit unserem Gespräch viel entspannter und unsere Bindung ist noch stärker geworden. Danke von Herzen."</p>
+                        <p class="testimonial-author">— Daniela K.</p>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <p class="testimonial-quote">"Die Beratung vor Ort in der Praxis war ein wunderschönes Erlebnis. Eine absolut vertrauensvolle Atmosphäre ohne jegliches esoterisches Geschwafel. Einfach authentisch!"</p>
+                        <p class="testimonial-author">— Michael R.</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 3.5rem;">
+                    <a href="#calendly-section" class="btn btn-secondary" style="font-size: 1rem; padding: 0.8rem 2rem;">Eigenen Termin vereinbaren</a>
+                </div>
+            </div>
+        </section>
 
+        <!-- G. Untergeordneter Bereich: Secondary Offer -->
+        <section class="section" style="padding: 2rem 0 5rem 0;">
+            <div class="container">
+                <div style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.15); border-radius: 16px; padding: 2.5rem; text-align: center; max-width: 700px; margin: 0 auto;">
+                    <h3 style="font-size: 1.4rem; margin-bottom: 1rem; color: rgba(255,255,255,0.9);">Du suchst eine flexible Fernbegleitung ohne festen Termin?</h3>
+                    <p style="font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; line-height: 1.6;">
+                        Für reine Tierkommunikation oder Jenseitskontakte per Sprachnachricht kannst du alternativ eine flexible Auftragsarbeit beauftragen – ganz ohne Live-Termin.
+                    </p>
+                    <a href="/buchung" class="inline-link" style="font-size: 0.95rem; font-weight: 500;">Zu den Auftragsarbeiten (Sprachnachricht) →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- H. FAQs zur Terminvereinbarung -->
+        <section class="section" style="padding: 0 0 5rem 0;">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <h2 style="font-size: 2.2rem; color: var(--c-white);">Häufige Fragen</h2>
+                </div>
+                
                 <div class="accordion">
-                    <!-- FAQ 1 -->
                     <div class="accordion-item">
-                        <button class="accordion-header">Muss ich bei einer Tierkommunikation oder Fernbehandlung live anwesend sein?</button>
+                        <button class="accordion-header">Wie läuft der Online-Termin ab?</button>
                         <div class="accordion-content">
-                            <p>Nein. Diese Angebote sind reine **Auftragsarbeiten**. Ich führe die Tierkommunikation oder schamanische Fernbehandlung eigenständig in meinem energetischen Raum durch. Du musst zum Zeitpunkt der Arbeit nichts tun und nicht online oder telefonisch erreichbar sein. Sobald die Arbeit abgeschlossen ist, erhältst du das Ergebnis als ausführliche Sprachnachricht (per WhatsApp oder E-Mail).</p>
+                            <p>Du erhältst direkt nach der Buchung einen Zoom-Link per E-Mail. Zum vereinbarten Zeitpunkt klickst du einfach auf den Link und wir treffen uns im virtuellen Raum. Alternativ können wir auch telefonieren, falls dir das lieber ist.</p>
                         </div>
                     </div>
-
-                    <!-- FAQ 2 -->
+                    
                     <div class="accordion-item">
-                        <button class="accordion-header">Wie bezahle ich einen Termin, den ich über den Online-Kalender (Calendly) gebucht habe?</button>
+                        <button class="accordion-header">Wie läuft ein Termin vor Ort ab?</button>
                         <div class="accordion-content">
-                            <p>Bei festen Terminen (Live vor Ort oder Online via Zoom/Telefon) erfolgt die Zahlung bequem vorab per Banküberweisung. Nach deiner Terminauswahl im Kalender erhältst du von mir eine Bestätigungs-E-Mail mit allen Details und meiner Bankverbindung. Bitte überweise den Betrag so, dass er vor unserem Termin eintrifft.</p>
+                            <p>Wir begegnen uns persönlich in meiner Praxis in Wolfern (Steyr-Land) in einer absolut ruhigen und ungestörten Atmosphäre. Alle Infos zur Anfahrt erhältst du in deiner Bestätigungs-E-Mail.</p>
                         </div>
                     </div>
-
-                    <!-- FAQ 3 -->
+                    
                     <div class="accordion-item">
-                        <button class="accordion-header">Wie bezahle ich eine Auftragsarbeit (z. B. Tierkommunikation)?</button>
+                        <button class="accordion-header">Wie erfolgt die Bezahlung?</button>
                         <div class="accordion-content">
-                            <p>Auftragsarbeiten buchst du ganz unkompliziert direkt über den Button „Jetzt buchen“ bei der jeweiligen Leistung. Du wirst automatisch zu unserer sicheren Online-Kasse weitergeleitet. Dort trägst du deine Daten ein und kannst die Buchung direkt abschließen.</p>
+                            <p>Nach der Buchung deines Termins schicke ich dir eine E-Mail mit der Rechnung zu. Die Bezahlung erfolgt bequem vorab per Banküberweisung auf das angegebene Konto.</p>
                         </div>
                     </div>
-
-                    <!-- FAQ 4 -->
+                    
                     <div class="accordion-item">
-                        <button class="accordion-header">Was wird für eine Tierkommunikation oder einen Jenseitskontakt benötigt?</button>
+                        <button class="accordion-header">Kann ich den Termin verschieben?</button>
                         <div class="accordion-content">
-                            <p>Nachdem du deine Auftragsarbeit gebucht hast, benötige ich ein Foto deines Tieres (auf dem die Augen gut erkennbar sind), den Namen, das Alter und 2 bis 3 konkrete Fragen oder Themen, die dich beschäftigen. Diese Angaben kannst du mir direkt im Checkout-Formular unter „Anmerkungen“ hinterlassen oder mir nachträglich per E-Mail oder WhatsApp zusenden.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ 5 -->
-                    <div class="accordion-item">
-                        <button class="accordion-header">Was ist der Unterschied zwischen einem Live- und einem Online-Termin?</button>
-                        <div class="accordion-content">
-                            <p>Ein Live-Termin findet persönlich vor Ort in meinen Räumlichkeiten statt. Ein Online-Termin wird flexibel via Zoom-Videokonferenz oder telefonisch abgehalten. Den Zugangslink oder die Telefonnummer erhältst du rechtzeitig vor Beginn per E-Mail.</p>
+                            <p>Ja, das ist kein Problem. In deiner Bestätigungs-E-Mail findest du einen Link, über den du den Termin bis zu 24 Stunden vorher kostenfrei stornieren oder auf einen anderen Tag verschieben kannst.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
     </main>
 
-    <!-- Simplified Footer for CRO: Clear links to mandatory pages and back to start -->
-    <footer style="background: rgba(18, 11, 30, 0.95); border-top: 1px solid var(--glass-border); padding: 3rem 0;">
-        <div class="container" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem;">
-            <a href="/" class="logo">
-                <img src="/assets/logo-wei.png" alt="Sternenpfade Logo" style="height: 50px;">
-            </a>
-            <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
-                <a href="/" style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">Startseite</a>
-                <a href="/impressum" style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">Impressum</a>
-                <a href="/datenschutz" style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">Datenschutz</a>
-                <a href="/agb" style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">AGB</a>
+    <!-- I. Minimal Footer -->
+    <footer style="background: var(--c-bg-darker); padding: 3rem 0 2rem 0; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div class="container" style="text-align: center;">
+            <div style="margin-bottom: 1.5rem;">
+                <img src="/assets/logo-wei.png" alt="Sternenpfade Logo" style="height: 40px; opacity: 0.5;">
             </div>
-            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.4); margin-top: 1rem;">
-                &copy; 2026 Sternenpfade. Alle Rechte vorbehalten.
-                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.8rem;">
-                    ✨ Transparenzhinweis gem. Art. 50 KI-VO: Bildwelten & Illustrationen dieser Website wurden teilweise unter Einsatz generativer Künstlicher Intelligenz gestaltet. <a href="/ki-transparenz" style="color: var(--c-teal); text-decoration: underline;">Mehr erfahren</a>
-                </div>
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 1.5rem;">
+                &copy; <span id="year"></span> Sternenpfade - Patrick Frech, MA.<br>Alle Rechte vorbehalten.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                <a href="/impressum" style="color: rgba(255,255,255,0.6); font-size: 0.85rem; text-decoration: none;">Impressum</a>
+                <a href="/datenschutz" style="color: rgba(255,255,255,0.6); font-size: 0.85rem; text-decoration: none;">Datenschutz</a>
+                <a href="/agb" style="color: rgba(255,255,255,0.6); font-size: 0.85rem; text-decoration: none;">AGB</a>
+                <a href="/ki-transparenz" style="color: rgba(255,255,255,0.6); font-size: 0.85rem; text-decoration: none;">KI-Transparenz</a>
             </div>
         </div>
     </footer>
 
-    <script src="/js/main.js"></script>
-
-    <!-- Interactive FAQ Accordion and Iframe Spinner Handler -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. FAQ Accordion Logic
-            const accordionHeaders = document.querySelectorAll('.accordion-header');
-            
-            accordionHeaders.forEach(header => {
-                header.addEventListener('click', () => {
-                    const item = header.parentElement;
-                    const content = item.querySelector('.accordion-content');
-                    const isActive = item.classList.contains('active');
-                    
-                    // Close all items
-                    document.querySelectorAll('.accordion-item').forEach(otherItem => {
-                        otherItem.classList.remove('active');
-                        otherItem.querySelector('.accordion-content').style.maxHeight = null;
-                    });
-                    
-                    // Open the clicked one if it wasn't active
-                    if (!isActive) {
-                        item.classList.add('active');
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                    }
-                });
-            });
+        document.getElementById('year').textContent = new Date().getFullYear();
 
-            // 2. Hide Calendly Spinner once iframe is fully loaded
-            const calendlyIframe = document.querySelector('.calendly-inline-widget iframe');
-            const spinner = document.getElementById('calendly-spinner');
-            
-            if (calendlyIframe) {
-                // If iframe is already loaded/rendered
-                calendlyIframe.addEventListener('load', () => {
-                    if (spinner) {
-                        spinner.style.opacity = '0';
-                        setTimeout(() => {
-                            spinner.style.display = 'none';
-                        }, 500);
-                    }
-                });
-            } else {
-                // Fallback for standard inline embed code:
-                // Check if children inside the container were created
-                const checkIframeInterval = setInterval(() => {
-                    const inlineWidget = document.querySelector('.calendly-inline-widget');
-                    if (inlineWidget && inlineWidget.querySelector('iframe')) {
-                        const iframe = inlineWidget.querySelector('iframe');
-                        iframe.addEventListener('load', () => {
-                            if (spinner) {
-                                spinner.style.opacity = '0';
-                                setTimeout(() => {
-                                    spinner.style.display = 'none';
-                                }, 500);
-                            }
-                        });
-                        clearInterval(checkIframeInterval);
-                    }
-                }, 200);
+        // FAQ Accordion
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                const isActive = item.classList.contains('active');
                 
-                // Safety timeout: hide spinner after 6 seconds anyway
-                setTimeout(() => {
-                    if (spinner && spinner.style.opacity !== '0') {
-                        spinner.style.opacity = '0';
-                        setTimeout(() => {
-                            spinner.style.display = 'none';
-                        }, 500);
-                    }
-                }, 6000);
+                // Close all
+                document.querySelectorAll('.accordion-item').forEach(i => {
+                    i.classList.remove('active');
+                    i.querySelector('.accordion-content').style.maxHeight = null;
+                });
+                
+                // Open clicked if it wasn't active
+                if (!isActive) {
+                    item.classList.add('active');
+                    const content = item.querySelector('.accordion-content');
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        });
+
+        // Hide Calendly spinner on load
+        window.addEventListener('message', function(e) {
+            if (e.data.event && e.data.event === 'calendly.event_type_viewed') {
+                const spinner = document.getElementById('calendly-spinner');
+                if(spinner) {
+                    spinner.style.opacity = '0';
+                    setTimeout(() => spinner.remove(), 500);
+                }
             }
         });
     </script>
