@@ -1,17 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
     fetchOrders();
-    loadDashboard();
+    
+    if (document.getElementById('dashboardMonths')) {
+        loadDashboard();
+    }
 
-    document.getElementById('statusFilter').addEventListener('change', fetchOrders);
-    document.getElementById('paymentFilter').addEventListener('change', fetchOrders);
-    document.getElementById('searchInput').addEventListener('input', fetchOrders);
-
+    if (document.getElementById('statusFilter')) {
+        document.getElementById('statusFilter').addEventListener('change', fetchOrders);
+    }
+    if (document.getElementById('paymentFilter')) {
+        document.getElementById('paymentFilter').addEventListener('change', fetchOrders);
+    }
+    if (document.getElementById('searchInput')) {
+        document.getElementById('searchInput').addEventListener('input', fetchOrders);
+    }
 });
 
 async function fetchOrders() {
-    const status = document.getElementById('statusFilter').value;
-    const payment = document.getElementById('paymentFilter').value;
-    const search = document.getElementById('searchInput').value;
+    const statusEl = document.getElementById('statusFilter');
+    const paymentEl = document.getElementById('paymentFilter');
+    const searchEl = document.getElementById('searchInput');
+
+    const status = statusEl ? statusEl.value : '';
+    const payment = paymentEl ? paymentEl.value : '';
+    const search = searchEl ? searchEl.value : '';
     
     let url = '/api/admin/orders';
     const params = new URLSearchParams();
@@ -26,11 +38,19 @@ async function fetchOrders() {
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error('Failed to fetch orders');
-        const orders = await response.json();
+        let orders = await response.json();
+        
+        if (window.location.pathname.includes('offene-posten.html')) {
+            orders = orders.filter(o => o.status === 'Offen' || o.payment_status === 'Ausstehend' || !o.payment_status);
+        }
+        
         renderOrders(orders);
     } catch (error) {
         console.error('Error fetching orders:', error);
-        document.getElementById('ordersBody').innerHTML = '<tr><td colspan="7" style="text-align:center; color:red;">Fehler beim Laden der Bestellungen. Server läuft?</td></tr>';
+        const tbody = document.getElementById('ordersBody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red;">Fehler beim Laden der Bestellungen. Server läuft?</td></tr>';
+        }
     }
 }
 
