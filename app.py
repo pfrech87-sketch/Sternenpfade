@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, send_from_directory, redirect
+from flask import Flask, request, jsonify, send_file, send_from_directory, redirect, abort
 from flask_cors import CORS
 import sqlite3
 import os
@@ -29,6 +29,22 @@ app = Flask(__name__,
             static_folder=os.path.dirname(os.path.abspath(__file__)), 
             static_url_path='/')
 CORS(app)
+
+@app.before_request
+def restrict_admin_access():
+    if request.path.startswith('/admin') or request.path.startswith('/api/admin'):
+        allowed_ips_env = os.environ.get('ADMIN_ALLOWED_IPS')
+        if allowed_ips_env:
+            allowed_ips = [ip.strip() for ip in allowed_ips_env.split(',')]
+        else:
+            allowed_ips = ['127.0.0.1', '::1']
+            
+        client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        if client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+            
+        if client_ip not in allowed_ips:
+            abort(403)
 
 # --- SYSTEM-CHECK BEIM START ---
 email_pw = os.environ.get('EMAIL_PASSWORD', '')

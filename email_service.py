@@ -9,7 +9,7 @@ from email import encoders
 # SMTP Konfiguration für Webador
 SMTP_SERVER = "mail.webador.com"
 SMTP_USER = "info@sternenpfade.at"
-SMTP_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 
 SENDER_NAME = "Sternenpfade"
 
