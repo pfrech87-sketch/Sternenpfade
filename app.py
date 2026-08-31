@@ -37,7 +37,7 @@ def restrict_admin_access():
         if allowed_ips_env:
             allowed_ips = [ip.strip() for ip in allowed_ips_env.split(',')]
         else:
-            allowed_ips = ['127.0.0.1', '::1']
+            allowed_ips = ['127.0.0.1', '::1', '46.125.147.76', '2001:4bc9:b06c:f515:bc44:6e95:4c90:7b36']
             
         client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         if client_ip:
