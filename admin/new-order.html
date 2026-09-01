@@ -200,6 +200,7 @@
                                         <option value="Friedensreise mit Anubis" data-price="25">Friedensreise mit Anubis (Meditation - 25 €)</option>
                                         <option value="Zurueck in deine Kraft" data-price="25">Zurück in deine Kraft (Meditation - 25 €)</option>
                                         <option value="Gratis Download Herzens-Verstaendnis" data-price="0">Gratis Download: Herzens-Verständnis (0 €)</option>
+                                        <option value="spirit-abo">Spirit-Abo (70 € / 90 €)</option>
                                         <option value="custom">-- Freier Betrag / Custom --</option>
                                     </select>
                                 </div>
@@ -217,6 +218,27 @@
                             <div class="form-group-col" id="customProductRow" style="display:none; margin-top:10px;">
                                 <label for="customProductName">Benutzerdefinierter Produktname</label>
                                 <input type="text" id="customProductName" placeholder="z.B. Individuelle Begleitung & Ritual">
+                            </div>
+
+                            <div id="spiritAboRow" style="display:none; margin-top:10px; background: #f0f7ed; padding: 10px; border-radius: 4px; border: 1px solid #c8e6c9;">
+                                <h5 style="margin: 0 0 10px 0; font-size: 14px; color: #333;">Spirit-Abo Details</h5>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                                    <div class="form-group-col" style="margin-bottom:0;">
+                                        <label for="spiritAboMonth">Monat & Jahr</label>
+                                        <input type="text" id="spiritAboMonth" placeholder="z.B. Sep26">
+                                    </div>
+                                    <div class="form-group-col" style="margin-bottom:0;">
+                                        <label for="spiritAboAnimalName">Name des Tieres / der Tiere</label>
+                                        <input type="text" id="spiritAboAnimalName" placeholder="z.B. PAULI">
+                                    </div>
+                                    <div class="form-group-col" style="margin-bottom:0;">
+                                        <label for="spiritAboCount">Anzahl</label>
+                                        <select id="spiritAboCount">
+                                            <option value="1">1 Tier (70 €)</option>
+                                            <option value="2">2 Tiere (90 €)</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -261,6 +283,10 @@
             const itemQtyInput = document.getElementById('itemQty');
             const customProductRow = document.getElementById('customProductRow');
             const customProductNameInput = document.getElementById('customProductName');
+            const spiritAboRow = document.getElementById('spiritAboRow');
+            const spiritAboMonthInput = document.getElementById('spiritAboMonth');
+            const spiritAboAnimalNameInput = document.getElementById('spiritAboAnimalName');
+            const spiritAboCountSelect = document.getElementById('spiritAboCount');
             const addItemBtn = document.getElementById('addItemBtn');
             const selectedItemsBody = document.getElementById('selectedItemsBody');
             const orderTotalDisplay = document.getElementById('orderTotalDisplay');
@@ -288,6 +314,19 @@
                             option.value = cust.name;
                             datalist.appendChild(option);
                         });
+                        
+                        // Check for ?customer= URL param to pre-fill
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const customerParam = urlParams.get('customer');
+                        if (customerParam) {
+                            customerNameInput.value = customerParam;
+                            // Trigger the input event to auto-fill the rest of the details
+                            customerNameInput.dispatchEvent(new Event('input'));
+                            
+                            // Also pre-select Spirit-Abo if we came from that dashboard
+                            productSelect.value = 'spirit-abo';
+                            productSelect.dispatchEvent(new Event('change'));
+                        }
                     }
                 } catch (error) {
                     console.error('Error fetching customers:', error);
@@ -309,14 +348,25 @@
             // Pre-fill fields when selecting standard product
             productSelect.addEventListener('change', () => {
                 const selectedOption = productSelect.options[productSelect.selectedIndex];
+                customProductRow.style.display = 'none';
+                spiritAboRow.style.display = 'none';
+                customProductNameInput.required = false;
+
                 if (selectedOption.value === 'custom') {
                     customProductRow.style.display = 'block';
                     customProductNameInput.required = true;
                     customProductNameInput.value = '';
                     itemPriceInput.value = '0.00';
+                } else if (selectedOption.value === 'spirit-abo') {
+                    spiritAboRow.style.display = 'block';
+                    // Update price based on selected count
+                    const updateSpiritAboPrice = () => {
+                        itemPriceInput.value = spiritAboCountSelect.value === '2' ? '90.00' : '70.00';
+                    };
+                    spiritAboCountSelect.addEventListener('change', updateSpiritAboPrice, { once: true });
+                    spiritAboCountSelect.onchange = updateSpiritAboPrice;
+                    updateSpiritAboPrice();
                 } else {
-                    customProductRow.style.display = 'none';
-                    customProductNameInput.required = false;
                     const price = selectedOption.getAttribute('data-price');
                     itemPriceInput.value = parseFloat(price).toFixed(2);
                 }
@@ -337,6 +387,14 @@
                         alert('Bitte gib einen Produktnamen ein.');
                         return;
                     }
+                } else if (name === 'spirit-abo') {
+                    const month = spiritAboMonthInput.value.trim();
+                    const animal = spiritAboAnimalNameInput.value.trim();
+                    if (!month || !animal) {
+                        alert('Bitte gib Monat/Jahr und Tiername für das Spirit-Abo ein.');
+                        return;
+                    }
+                    name = `Spirit-Abo, ${month}, ${animal}`;
                 }
 
                 const price = parseFloat(itemPriceInput.value);
@@ -366,6 +424,10 @@
                 customProductRow.style.display = 'none';
                 customProductNameInput.value = '';
                 customProductNameInput.required = false;
+                spiritAboRow.style.display = 'none';
+                spiritAboMonthInput.value = '';
+                spiritAboAnimalNameInput.value = '';
+                spiritAboCountSelect.value = '1';
 
                 renderSelectedItems();
             });

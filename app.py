@@ -931,6 +931,55 @@ def admin_refund_order(order_id):
     finally:
         conn.close()
 
+@app.route('/api/admin/spirit-abo', methods=['GET'])
+@requires_auth
+def get_spirit_abo_subscribers():
+    conn = get_db_connection()
+    try:
+        # Get all order items that start with 'Spirit-Abo'
+        query = '''
+            SELECT 
+                o.id as order_id,
+                o.order_number,
+                o.customer_name,
+                o.customer_email,
+                o.created_at,
+                oi.item_name,
+                oi.price
+            FROM order_items oi
+            JOIN orders o ON oi.order_id = o.id
+            WHERE oi.item_name LIKE 'Spirit-Abo%'
+            ORDER BY o.created_at DESC
+        '''
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        
+        subscribers = []
+        for row in rows:
+            # Parse 'Spirit-Abo, Sep26, PAULI' -> ['Spirit-Abo', 'Sep26', 'PAULI']
+            parts = [p.strip() for p in row['item_name'].split(',')]
+            monat = parts[1] if len(parts) > 1 else '-'
+            tier_name = parts[2] if len(parts) > 2 else '-'
+            
+            subscribers.append({
+                'order_id': row['order_id'],
+                'order_number': row['order_number'],
+                'customer_name': row['customer_name'],
+                'customer_email': row['customer_email'],
+                'created_at': row['created_at'],
+                'monat': monat,
+                'tier_name': tier_name,
+                'price': row['price']
+            })
+            
+        return jsonify(subscribers)
+    except Exception as e:
+        print(f"Error fetching Spirit-Abo subscribers: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
 @app.route('/api/admin/customers', methods=['GET'])
 @requires_auth
 def get_admin_customers():
