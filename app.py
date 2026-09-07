@@ -1088,6 +1088,52 @@ def run_fix_database():
     else:
         return jsonify({'success': False, 'error': 'Fehler bei der Datenbankreparatur.', 'logs': logs}), 500
 
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    data = request.json
+    if not data or 'message' not in data:
+        return jsonify({'error': 'No message provided'}), 400
+        
+    user_message = data['message']
+    
+    # Initialize Gemini API
+    api_key = os.environ.get('GEMINI_API_KEY')
+    if not api_key:
+        return jsonify({'error': 'Server configuration error (API Key missing)'}), 500
+        
+    import google.generativeai as genai
+    genai.configure(api_key=api_key)
+    
+    system_instruction = """Du bist der digitale Begleiter auf der Website "Sternenpfade". 
+Du sprichst als Assistent für Patrick (nicht "Patrick von Sternenpfade", sondern einfach "Patrick").
+Deine Tonalität ist sehr sanft, einfühlsam und liebevoll.
+Halte deine Texte immer sehr kurz und biete schnelle, knappe Lösungen an statt langer Absätze. 
+Biete Nutzern stets an, dass sie sich direkt bei Patrick melden können. 
+Verwende am Ende passender Antworten (oder wenn jemand Kontakt sucht) diesen Link, den du exakt so als Markdown-Link formatieren musst:
+[Patrick per WhatsApp schreiben](https://wa.me/4369010571792)
+Sei stets respektvoll, einfühlsam und professionell."""
+    
+    try:
+        model = genai.GenerativeModel('gemini-flash-latest', system_instruction=system_instruction)
+        
+        # If there is a chat history, we could pass it here. For now, simple single turn or send full context from frontend.
+        # We expect the frontend to send the full conversation history.
+        history = data.get('history', [])
+        formatted_history = []
+        for msg in history:
+            role = 'user' if msg.get('role') == 'user' else 'model'
+            formatted_history.append({'role': role, 'parts': [msg.get('content', '')]})
+            
+        chat_session = model.start_chat(history=formatted_history)
+        response = chat_session.send_message(user_message)
+        
+        return jsonify({'response': response.text})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print(f"Error in chat API: {e}")
+        return jsonify({'error': 'Ich konnte gerade leider keine Antwort generieren. Bitte versuche es später noch einmal.'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
 

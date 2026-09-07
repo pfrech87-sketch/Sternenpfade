@@ -293,3 +293,20 @@ document.addEventListener('DOMContentLoaded', () => {
         startAutoPlay();
     }
 });
+
+// Inject Chatbot dynamically
+(function initChatbot() {
+    const cacheBuster = '?v=' + new Date().getTime();
+    
+    // Load CSS
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/css/chatbot.css' + cacheBuster;
+    document.head.appendChild(link);
+
+    // Load JS
+    const script = document.createElement('script');
+    script.src = '/js/chatbot.js' + cacheBuster;
+    script.defer = true;
+    document.body.appendChild(script);
+})();
