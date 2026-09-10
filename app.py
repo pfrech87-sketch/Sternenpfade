@@ -30,22 +30,8 @@ app = Flask(__name__,
             static_url_path='/')
 CORS(app)
 
-@app.before_request
-def restrict_admin_access():
-    if request.path.startswith('/admin') or request.path.startswith('/api/admin'):
-        allowed_ips_env = os.environ.get('ADMIN_ALLOWED_IPS')
-        if allowed_ips_env:
-            allowed_ips = [ip.strip() for ip in allowed_ips_env.split(',')]
-        else:
-            allowed_ips = ['127.0.0.1', '::1', '46.125.147.76', '2001:4bc9:b06c:f515:bc44:6e95:4c90:7b36']
-            
-        client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-        if client_ip:
-            client_ip = client_ip.split(',')[0].strip()
-            
-        if client_ip not in allowed_ips:
-            abort(403)
-
+# --- IP Restriction removed ---
+# Admin access is now only protected by Basic Auth.
 # --- SYSTEM-CHECK BEIM START ---
 email_pw = os.environ.get('EMAIL_PASSWORD', '')
 if not email_pw:
