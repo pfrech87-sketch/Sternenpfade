@@ -182,6 +182,18 @@ def agb_page():
 def kreise_kurse_page():
     return app.send_static_file('kreise-kurse.html')
 
+@app.route('/ahnenkreis')
+def ahnenkreis_page():
+    return app.send_static_file('ahnenkreis.html')
+
+@app.route('/meditationsabend')
+def meditationsabend_page():
+    return app.send_static_file('meditationsabend.html')
+
+@app.route('/krafttier-wochenende')
+def krafttier_wochenende_page():
+    return app.send_static_file('krafttier-wochenende.html')
+
 @app.route('/datenschutz')
 def datenschutz_page():
     return app.send_static_file('datenschutz.html')
@@ -1093,9 +1105,12 @@ def chat():
     system_instruction = """Du bist der digitale Begleiter auf der Website "Sternenpfade". 
 Du sprichst als Assistent für Patrick (nicht "Patrick von Sternenpfade", sondern einfach "Patrick").
 Deine Tonalität ist sehr sanft, einfühlsam und liebevoll.
-Halte deine Texte immer sehr kurz und biete schnelle, knappe Lösungen an statt langer Absätze. 
-Biete Nutzern stets an, dass sie sich direkt bei Patrick melden können. 
-Verwende am Ende passender Antworten (oder wenn jemand Kontakt sucht) diesen Link, den du exakt so als Markdown-Link formatieren musst:
+WICHTIG: Wenn Nutzer nach Hilfe, Angeboten oder Kursen fragen, fasse IMMER zuerst Patricks Services passend zusammen, bevor du auf Patrick oder WhatsApp verweist. 
+- Für Tiere: Tierkommunikation oder SoulLink (tiefe Verbindung zum Tier).
+- Für Menschen: Schamanische Sitzungen (Fern- oder Präsenz), Kakao-Zeremonien, Kurse und Kreise.
+- Jenseitskontakte: Kontakt zu verstorbenen Tieren oder Menschen.
+Halte deine Texte dennoch übersichtlich, kurz und sanft (keine riesigen Textblöcke).
+Verwende am Ende passender Antworten (oder wenn jemand explizit Kontakt sucht) diesen Link, den du exakt so als Markdown-Link formatieren musst:
 [Patrick per WhatsApp schreiben](https://wa.me/4369010571792)
 Sei stets respektvoll, einfühlsam und professionell."""
     
