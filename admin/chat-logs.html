@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Logs | Sternenpfade Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .chat-log-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background: var(--bg-card); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .chat-log-table th, .chat-log-table td { padding: 1.2rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.9); vertical-align: top;}
+        .chat-log-table th { background: rgba(0,0,0,0.3); font-weight: 600; color: var(--c-gold); }
+        .message-box { max-width: 400px; max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
+        .message-user { border-left: 3px solid var(--c-teal); }
+        .message-bot { border-left: 3px solid var(--c-pink); }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Sternenpfade</h2>
+                <p>Administration</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/admin/index.html">Dashboard</a></li>
+                <li><a href="/admin/order.html">Bestellungen</a></li>
+                <li><a href="/admin/customers.html">Kunden</a></li>
+                <li><a href="/admin/chat-logs.html" class="active">Chat-Logs</a></li>
+                <li><a href="/" target="_blank">Zur Website</a></li>
+                <li style="margin-top: 2rem;"><a href="#" id="logoutBtn" style="color: #ff6b6b;">Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <h1>Chatbot Protokolle</h1>
+            </header>
+
+            <div class="content-area">
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Hier siehst du die letzten 100 Fragen und Antworten des KI-Chatbots.</p>
+                
+                <table class="chat-log-table">
+                    <thead>
+                        <tr>
+                            <th>Datum / Zeit</th>
+                            <th>Nutzer (Frage)</th>
+                            <th>Bot (Antwort)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-tbody">
+                        <tr><td colspan="3" style="text-align:center; padding: 2rem;">Lade Logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!checkAuth()) return;
+            
+            try {
+                const response = await fetch('/api/chat-logs', {
+                    headers: { 'Authorization': 'Basic ' + localStorage.getItem('adminAuth') }
+                });
+                
+                if (response.status === 401) {
+                    handleUnauthorized();
+                    return;
+                }
+                
+                const logs = await response.json();
+                const tbody = document.getElementById('logs-tbody');
+                
+                if (logs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 3rem;">Noch keine Chat-Logs vorhanden.</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = logs.map(log => `
+                    <tr>
+                        <td style="white-space: nowrap; font-size: 0.9rem; color: var(--c-hint);">${new Date(log.created_at).toLocaleString('de-DE')}</td>
+                        <td><div class="message-box message-user">${escapeHtml(log.user_message)}</div></td>
+                        <td><div class="message-box message-bot">${escapeHtml(log.bot_response)}</div></td>
+                    </tr>
+                `).join('');
+                
+            } catch (err) {
+                console.error(err);
+                document.getElementById('logs-tbody').innerHTML = '<tr><td colspan="3" style="text-align: center; color: #ff6b6b;">Fehler beim Laden der Logs.</td></tr>';
+            }
+        });
+
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>

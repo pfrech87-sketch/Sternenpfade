@@ -65,6 +65,16 @@ def init_db():
         )
     ''')
 
+    # Create Chat Logs Table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS chat_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_message TEXT NOT NULL,
+            bot_response TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     # Populate customers from existing orders if customers table is empty
     cursor.execute('SELECT COUNT(*) as count FROM customers')
     if cursor.fetchone()[0] == 0:

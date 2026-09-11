@@ -1105,14 +1105,32 @@ def chat():
     system_instruction = """Du bist der digitale Begleiter auf der Website "Sternenpfade". 
 Du sprichst als Assistent für Patrick (nicht "Patrick von Sternenpfade", sondern einfach "Patrick").
 Deine Tonalität ist sehr sanft, einfühlsam und liebevoll.
-WICHTIG: Wenn Nutzer nach Hilfe, Angeboten oder Kursen fragen, fasse IMMER zuerst Patricks Services passend zusammen, bevor du auf Patrick oder WhatsApp verweist. 
-- Für Tiere: Tierkommunikation oder SoulLink (tiefe Verbindung zum Tier).
-- Für Menschen: Schamanische Sitzungen (Fern- oder Präsenz), Kakao-Zeremonien, Kurse und Kreise.
-- Jenseitskontakte: Kontakt zu verstorbenen Tieren oder Menschen.
-Halte deine Texte dennoch übersichtlich, kurz und sanft (keine riesigen Textblöcke).
-Verwende am Ende passender Antworten (oder wenn jemand explizit Kontakt sucht) diesen Link, den du exakt so als Markdown-Link formatieren musst:
+
+WICHTIGES WISSEN ZU TERMINEN & KREISEN 2026:
+- 09. Oktober 2026: Ahnenkreis "Wurzeln der Kraft" (Friedensarbeit mit dem Familienfeld, 90€)
+- 17. Oktober 2026: Krafttier-Wochenende (Schamanische Reise zum Verbündeten, 190€)
+- 30. Oktober 2026: Meditationsabend Jenseits (Mediale Verbindung zur geistigen Welt, 90€)
+
+REGELN FÜR TERMINANFRAGEN:
+Wenn ein Nutzer nach "Terminen", "Gruppenterminen" oder "nächsten Terminen" fragt, antworte in etwa so:
+"Ja, von Herzen gerne bietet Patrick auch wundervolle Gruppentermine an. In unseren Kreisen und Seminaren fließen die Energien der Gemeinschaft auf ganz besondere Weise zusammen. 
+Die nächsten anstehenden Termine sind:
+- 09. Oktober: Ahnenkreis 'Wurzeln der Kraft'
+- 17. Oktober: Krafttier-Wochenende
+- 30. Oktober: Meditationsabend Jenseits
+
+Persönliche 1:1 Termine kannst du jederzeit direkt über unser Buchungstool vereinbaren.
+Damit du einen Einblick hast, was Patrick alles anbietet:
+* Für Menschen (auch in Gruppen): Heilsame Kakao-Zeremonien, schamanische Kreise und Seminare (sowie persönliche schamanische Einzelsitzungen in Präsenz oder aus der Ferne).
+* Für Tiere: Einfühlsame Tierkommunikation oder SoulLink, um die Verbindung zu deinem Tier zu vertiefen.
+* Jenseitskontakte: Liebevolle Verbindungen zu verstorbenen Seelen (Mensch und Tier).
+
+Frag Patrick am besten einfach ganz direkt nach weiteren Details oder aktuellen Gruppenterminen. Er schickt dir gerne die nächsten Daten zu:
 [Patrick per WhatsApp schreiben](https://wa.me/4369010571792)
-Sei stets respektvoll, einfühlsam und professionell."""
+Wir freuen uns darauf, dich vielleicht bald in einem unserer Kreise willkommen zu heißen. 🤍"
+
+Halte deine Texte übersichtlich, kurz und sanft. Verwende immer exakt diesen WhatsApp Link am Ende:
+[Patrick per WhatsApp schreiben](https://wa.me/4369010571792)"""
     
     try:
         model = genai.GenerativeModel('gemini-3.5-flash', system_instruction=system_instruction)
@@ -1128,12 +1146,38 @@ Sei stets respektvoll, einfühlsam und professionell."""
         chat_session = model.start_chat(history=formatted_history)
         response = chat_session.send_message(user_message)
         
-        return jsonify({'response': response.text})
+
+        response_text = response.text
+        
+        # Log to database
+        try:
+            from db import get_db_connection
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO chat_logs (user_message, bot_response) VALUES (?, ?)', (user_message, response_text))
+            conn.commit()
+            conn.close()
+        except Exception as db_e:
+            print(f"Error saving chat log: {db_e}")
+
+        return jsonify({'response': response_text})
     except Exception as e:
         import traceback
         traceback.print_exc()
         print(f"Error in chat API: {e}")
         return jsonify({'error': 'Ich konnte gerade leider keine Antwort generieren. Bitte versuche es später noch einmal.'}), 500
+
+
+@app.route('/api/chat-logs')
+@requires_auth
+def api_chat_logs():
+    from db import get_db_connection
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM chat_logs ORDER BY created_at DESC LIMIT 100')
+    logs = cursor.fetchall()
+    conn.close()
+    return jsonify([dict(ix) for ix in logs])
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

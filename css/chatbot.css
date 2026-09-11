@@ -312,3 +312,29 @@
     margin-top: 8px;
     box-shadow: 0 2px 8px rgba(37, 211, 102, 0.4);
 }
+
+/* Chatbot Suggestions */
+#sternenpfade-chatbot-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 15px 10px 15px;
+}
+
+.chatbot-suggestion-chip {
+    background: rgba(250, 180, 53, 0.1);
+    border: 1px solid rgba(250, 180, 53, 0.4);
+    color: var(--c-gold, #D4AF37);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.chatbot-suggestion-chip:hover {
+    background: rgba(250, 180, 53, 0.2);
+    border-color: rgba(250, 180, 53, 0.8);
+    transform: translateY(-2px);
+}

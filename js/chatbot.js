@@ -12,6 +12,12 @@
                 <div id="sternenpfade-chatbot-messages">
                     <div class="chatbot-message bot">Hallo! Ich bin der kleine Sternenfuchs. Wie kann ich dir heute auf deinem Weg weiterhelfen?</div>
                 </div>
+                
+                <div id="sternenpfade-chatbot-suggestions">
+                    <div class="chatbot-suggestion-chip">Wann sind die nächsten Termine?</div>
+                    <div class="chatbot-suggestion-chip">Gibt es Gruppentermine?</div>
+                    <div class="chatbot-suggestion-chip">Was ist Tierkommunikation?</div>
+                </div>
                 <div id="sternenpfade-chatbot-input-area">
                     <input type="text" id="sternenpfade-chatbot-input" placeholder="Schreibe eine Nachricht..." autocomplete="off" />
                     <button id="sternenpfade-chatbot-send">
@@ -106,6 +112,16 @@
     };
 
     sendBtn.addEventListener('click', sendMessage);
+    
+    // Add event listeners to suggestion chips
+    document.querySelectorAll('.chatbot-suggestion-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            inputField.value = chip.textContent;
+            sendMessage();
+            // Hide suggestions after first use
+            document.getElementById('sternenpfade-chatbot-suggestions').style.display = 'none';
+        });
+    });
     inputField.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             sendMessage();
