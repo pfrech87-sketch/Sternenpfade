@@ -1144,23 +1144,45 @@ Halte deine Texte übersichtlich, kurz und sanft. Verwende immer exakt diesen Wh
             formatted_history.append({'role': role, 'parts': [msg.get('content', '')]})
             
         chat_session = model.start_chat(history=formatted_history)
-        response = chat_session.send_message(user_message)
+        response = chat_session.send_message(user_message, stream=True)
         
+        def generate():
+            full_response = ""
+            try:
+                for chunk in response:
+                    text = chunk.text
+                    if text:
+                        full_response += text
+                        import json
+                        yield f"data: {json.dumps({'text': text})}
 
-        response_text = response.text
-        
-        # Log to database
-        try:
-            from db import get_db_connection
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute('INSERT INTO chat_logs (user_message, bot_response) VALUES (?, ?)', (user_message, response_text))
-            conn.commit()
-            conn.close()
-        except Exception as db_e:
-            print(f"Error saving chat log: {db_e}")
+"
+                
+                # Log to database
+                try:
+                    from db import get_db_connection
+                    conn = get_db_connection()
+                    cursor = conn.cursor()
+                    cursor.execute('INSERT INTO chat_logs (user_message, bot_response) VALUES (?, ?)', (user_message, full_response))
+                    conn.commit()
+                    conn.close()
+                except Exception as db_e:
+                    print(f"Error saving chat log: {db_e}")
+                    
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                import json
+                yield f"data: {json.dumps({'error': 'Fehler bei der Generierung'})}
 
-        return jsonify({'response': response_text})
+"
+            
+            yield "data: [DONE]
+
+"
+
+        from flask import Response
+        return Response(generate(), mimetype='text/event-stream')
     except Exception as e:
         import traceback
         traceback.print_exc()

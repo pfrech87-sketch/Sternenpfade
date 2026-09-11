@@ -95,12 +95,44 @@
             removeTypingIndicator(typingId);
 
             if (response.ok) {
-                const data = await response.json();
-                addMessage(data.response, 'bot');
+                const msgDiv = addMessage('', 'bot');
+                let fullResponse = "";
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let buffer = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // keep incomplete line
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                            const dataStr = line.substring(6);
+                            try {
+                                const dataObj = JSON.parse(dataStr);
+                                if (dataObj.text) {
+                                    fullResponse += dataObj.text;
+                                    updateMessageHTML(msgDiv, fullResponse);
+                                    scrollToBottom();
+                                } else if (dataObj.error) {
+                                    updateMessageHTML(msgDiv, "Es gab einen Fehler während der Generierung.");
+                                    scrollToBottom();
+                                }
+                            } catch (e) {
+                                console.error("Error parsing SSE:", e);
+                            }
+                        }
+                    }
+                }
                 
                 // Update history
                 chatHistory.push({ role: 'user', content: text });
-                chatHistory.push({ role: 'model', content: data.response });
+                chatHistory.push({ role: 'model', content: fullResponse });
             } else {
                 addMessage('Verzeihung, es gab einen Fehler bei der Verbindung. Bitte versuche es später noch einmal.', 'bot');
             }
@@ -132,17 +164,26 @@
         const msgDiv = document.createElement('div');
         msgDiv.className = `chatbot-message ${sender}`;
         if (sender === 'bot') {
-            let html = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="chat-link">$1</a>')
-                .replace(/\n/g, '<br>');
-            msgDiv.innerHTML = html;
+            updateMessageHTML(msgDiv, text);
         } else {
             msgDiv.textContent = text;
         }
         messagesContainer.appendChild(msgDiv);
         scrollToBottom();
+        return msgDiv;
+    }
+
+    function updateMessageHTML(msgDiv, text) {
+        if (!text) {
+            msgDiv.innerHTML = '';
+            return;
+        }
+        let html = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="chat-link">$1</a>')
+            .replace(/\n/g, '<br>');
+        msgDiv.innerHTML = html;
     }
 
     function showTypingIndicator() {
