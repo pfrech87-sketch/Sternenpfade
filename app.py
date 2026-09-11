@@ -1115,7 +1115,7 @@ Verwende am Ende passender Antworten (oder wenn jemand explizit Kontakt sucht) d
 Sei stets respektvoll, einfühlsam und professionell."""
     
     try:
-        model = genai.GenerativeModel('gemini-flash-latest', system_instruction=system_instruction)
+        model = genai.GenerativeModel('gemini-3.5-flash', system_instruction=system_instruction)
         
         # If there is a chat history, we could pass it here. For now, simple single turn or send full context from frontend.
         # We expect the frontend to send the full conversation history.
