@@ -292,6 +292,16 @@ document.addEventListener('DOMContentLoaded', () => {
         showSlide(0);
         startAutoPlay();
     }
+
+    // 7. GTM Tracking for WhatsApp Links
+    document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
+        link.addEventListener('click', () => {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+                'event': 'whatsapp_click'
+            });
+        });
+    });
 });
 
 // Inject Chatbot dynamically

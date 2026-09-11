@@ -21,7 +21,7 @@
                     </button>
                 </div>
             </div>
-            <div id="sternenpfade-chatbot-prompt">✨ Frag mich! ✨</div>
+            <div id="sternenpfade-chatbot-prompt">Brauchst du Hilfe?</div>
             <div id="sternenpfade-chatbot-avatar"></div>
         </div>
     `;
@@ -42,8 +42,14 @@
         chatWindow.classList.toggle('active');
         const container = document.getElementById('sternenpfade-chatbot-container');
         container.classList.toggle('chat-active');
+        
         if (chatWindow.classList.contains('active')) {
             inputField.focus();
+            // GTM Tracking: Chatbot Opened
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+                'event': 'chatbot_open'
+            });
         }
     });
 
@@ -61,6 +67,12 @@
         // Add user message to UI
         addMessage(text, 'user');
         inputField.value = '';
+
+        // GTM Tracking: Chatbot Message Sent
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            'event': 'chatbot_message_sent'
+        });
 
         // Add typing indicator
         const typingId = showTypingIndicator();
