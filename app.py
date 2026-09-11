@@ -1154,9 +1154,7 @@ Halte deine Texte übersichtlich, kurz und sanft. Verwende immer exakt diesen Wh
                     if text:
                         full_response += text
                         import json
-                        yield f"data: {json.dumps({'text': text})}
-
-"
+                        yield f"data: {json.dumps({'text': text})}\\n\\n"
                 
                 # Log to database
                 try:
@@ -1173,13 +1171,9 @@ Halte deine Texte übersichtlich, kurz und sanft. Verwende immer exakt diesen Wh
                 import traceback
                 traceback.print_exc()
                 import json
-                yield f"data: {json.dumps({'error': 'Fehler bei der Generierung'})}
-
-"
+                yield f"data: {json.dumps({'error': 'Fehler bei der Generierung'})}\\n\\n"
             
-            yield "data: [DONE]
-
-"
+            yield "data: [DONE]\\n\\n"
 
         from flask import Response
         return Response(generate(), mimetype='text/event-stream')
